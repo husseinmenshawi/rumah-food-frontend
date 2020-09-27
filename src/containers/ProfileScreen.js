@@ -14,7 +14,7 @@ function ProfileScreen({ navigation }) {
     if (!user) {
       fetchProfileDetails();
     }
-  }, [user]);
+  }, []);
 
   const fetchProfileDetails = () => {
     fetch(`http://${config.ipAddress}:3000/api/v1.0/gatekeeper/me`, {
