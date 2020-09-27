@@ -75,6 +75,7 @@ function MyItemsScreen({ navigation }) {
       keyExtractor={(item) => item.id}
     />
   );
+  const addIconDisabled = items.length === 10;
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
@@ -94,10 +95,28 @@ function MyItemsScreen({ navigation }) {
             flex: 1,
             flexDirection: "row",
             justifyContent: "flex-end",
+            alignItems: "center",
           }}
         >
-          <TouchableOpacity onPress={handleAddItem}>
-            <Ionicons name="ios-add-circle-outline" size={30} color="black" />
+          <Text style={{ fontSize: 25, fontWeight: "bold" }}>
+            {items.length}
+          </Text>
+          <Text>/10</Text>
+        </View>
+        <View
+          style={{
+            flex: 0.3,
+            flexDirection: "row",
+            justifyContent: "flex-end",
+          }}
+        >
+          <TouchableOpacity disabled={addIconDisabled} onPress={handleAddItem}>
+            <Ionicons
+              style={{ color: addIconDisabled ? "grey" : "black" }}
+              name="ios-add-circle-outline"
+              size={30}
+              color="black"
+            />
           </TouchableOpacity>
         </View>
       </View>
