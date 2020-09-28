@@ -48,6 +48,7 @@ function MyItemsScreen({ navigation }) {
   const handleItemOnClick = (item) => {
     navigation.navigate("ItemDetails", {
       item,
+      accessToken,
     });
   };
 
@@ -56,6 +57,11 @@ function MyItemsScreen({ navigation }) {
       kitchenId,
       accessToken,
     });
+  };
+
+  //TODO: Research more to check if this is the best practice
+  const handleFetchItems = () => {
+    fetchItems();
   };
 
   const Item = ({ item }) => (
@@ -94,7 +100,7 @@ function MyItemsScreen({ navigation }) {
           style={{
             flex: 1,
             flexDirection: "row",
-            justifyContent: "flex-end",
+            justifyContent: "center",
             alignItems: "center",
           }}
         >
@@ -105,7 +111,24 @@ function MyItemsScreen({ navigation }) {
         </View>
         <View
           style={{
-            flex: 0.3,
+            flex: 1,
+            flexDirection: "row",
+            justifyContent: "flex-end",
+            alignItems: "center",
+          }}
+        >
+          <TouchableOpacity onPress={handleFetchItems}>
+            <Ionicons
+              style={{ color: "black" }}
+              name="ios-refresh"
+              size={30}
+              color="black"
+            />
+          </TouchableOpacity>
+        </View>
+        <View
+          style={{
+            flex: 0.6,
             flexDirection: "row",
             justifyContent: "flex-end",
           }}
@@ -132,7 +155,6 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     flexDirection: "row",
-    // justifyContent: "flex-end",
     paddingTop: 100,
     paddingBottom: 10,
     paddingHorizontal: 30,
