@@ -1,19 +1,48 @@
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  FlatList,
-} from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, Alert } from "react-native";
 import { NetworkContext } from "../../network-context";
 import config from "../../config";
 
 function ItemDetailsScreen({ navigation }) {
   const params = React.useContext(NetworkContext);
-  const { item } = params;
+  const { item, accessToken } = params;
+  const [error, setError] = React.useState(null);
   const itemActivity = item && item.isEnabled ? "Active" : "Inactive";
+
+  const handleDeleteItem = () => {
+    Alert.alert(
+      "Are you sure you want delete this item?",
+      `This will permanently delete the item`,
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        { text: "Yes", onPress: () => deleteItem() },
+      ],
+      { cancelable: true }
+    );
+  };
+
+  const deleteItem = () => {
+    fetch(`http://${config.ipAddress}:3000/api/v1.0/kitchen/item/${item.id}`, {
+      method: "delete",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => {
+        if (res.status === 204) {
+          navigation.goBack();
+        }
+      })
+      .catch((e) => {
+        setError("Some server error!");
+        throw new Error("Server Error", e);
+      });
+  };
 
   const itemsRows = (
     <View style={styles.itemContainer}>
@@ -35,7 +64,6 @@ function ItemDetailsScreen({ navigation }) {
       </View>
       {item ? itemsRows : null}
       <View style={styles.buttonContainer}>
-        {/* <TouchableOpacity style={styles.addItem} onPress={handleLogout}> */}
         <TouchableOpacity style={styles.editItem}>
           <Text
             style={{ color: "white", alignSelf: "center", fontWeight: "bold" }}
@@ -43,7 +71,7 @@ function ItemDetailsScreen({ navigation }) {
             Edit Item
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.deleteItem}>
+        <TouchableOpacity style={styles.deleteItem} onPress={handleDeleteItem}>
           <Text
             style={{ color: "white", alignSelf: "center", fontWeight: "bold" }}
           >
