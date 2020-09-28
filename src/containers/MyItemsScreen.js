@@ -6,6 +6,7 @@ import {
   View,
   TouchableOpacity,
   FlatList,
+  Alert,
 } from "react-native";
 import { NetworkContext } from "../../network-context";
 import config from "../../config";
@@ -17,11 +18,33 @@ function MyItemsScreen({ navigation }) {
   const { accessToken, kitchenId } = params;
   const [error, setError] = React.useState(null);
   const [items, setItems] = React.useState([]);
+  const addIconDisabled = items.length === 10;
+
   React.useEffect(() => {
     if (items.length === 0) {
       fetchItems();
     }
   }, []);
+
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      fetchItems();
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
+  React.useEffect(() => {
+    if (error) {
+      Alert.alert(
+        "Error",
+        `${error}`,
+        [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+        { cancelable: false }
+      );
+    }
+  }, [error]);
+
   const fetchItems = () => {
     fetch(
       `http://${config.ipAddress}:3000/api/v1.0/kitchen/item/me?kitchenId=${kitchenId}`,
@@ -53,10 +76,19 @@ function MyItemsScreen({ navigation }) {
   };
 
   const handleAddItem = () => {
-    navigation.navigate("AddItem", {
-      kitchenId,
-      accessToken,
-    });
+    if (addIconDisabled) {
+      Alert.alert(
+        "Maximum items reached!",
+        "You are only allowed to add 10 items!",
+        [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+        { cancelable: false }
+      );
+    } else {
+      navigation.navigate("AddItem", {
+        kitchenId,
+        accessToken,
+      });
+    }
   };
 
   //TODO: Research more to check if this is the best practice
@@ -66,7 +98,11 @@ function MyItemsScreen({ navigation }) {
 
   const Item = ({ item }) => (
     <TouchableOpacity
-      style={styles.itemContainer}
+      style={
+        item.isEnabled
+          ? styles.activeItemContainer
+          : styles.inactiveItemContainer
+      }
       onPress={() => handleItemOnClick(item)}
     >
       <Text style={styles.itemText}>{item.itemName}</Text>
@@ -81,7 +117,7 @@ function MyItemsScreen({ navigation }) {
       keyExtractor={(item) => item.id}
     />
   );
-  const addIconDisabled = items.length === 10;
+
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
@@ -133,9 +169,9 @@ function MyItemsScreen({ navigation }) {
             justifyContent: "flex-end",
           }}
         >
-          <TouchableOpacity disabled={addIconDisabled} onPress={handleAddItem}>
+          <TouchableOpacity onPress={handleAddItem}>
             <Ionicons
-              style={{ color: addIconDisabled ? "grey" : "black" }}
+              style={{ color: "black" }}
               name="ios-add-circle-outline"
               size={30}
               color="black"
@@ -159,8 +195,22 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     paddingHorizontal: 30,
   },
-  itemContainer: {
+  activeItemContainer: {
     backgroundColor: "white",
+    padding: 20,
+    marginHorizontal: 30,
+    marginVertical: 10,
+    borderRadius: 10,
+    shadowColor: "black",
+    shadowOpacity: 0.5,
+    shadowRadius: 2,
+    shadowOffset: {
+      height: 1,
+      width: 1,
+    },
+  },
+  inactiveItemContainer: {
+    backgroundColor: "#d1d1d1",
     padding: 20,
     marginHorizontal: 30,
     marginVertical: 10,

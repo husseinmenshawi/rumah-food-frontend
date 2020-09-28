@@ -37,7 +37,7 @@ function ProfileScreen({ navigation }) {
   };
 
   const handleLogout = () => {
-    fetch("http://192.168.0.103:3000/api/v1.0/gatekeeper/me/token", {
+    fetch(`http://${config.ipAddress}:3000/api/v1.0/gatekeeper/me/token`, {
       method: "delete",
       headers: {
         Authorization: `Bearer ${accessToken}`,
