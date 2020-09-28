@@ -6,9 +6,51 @@ import config from "../../config";
 
 function ItemDetailsScreen({ navigation }) {
   const params = React.useContext(NetworkContext);
-  const { item, accessToken } = params;
+  const { itemId, accessToken } = params;
   const [error, setError] = React.useState(null);
-  const itemActivity = item && item.isEnabled ? "Active" : "Inactive";
+  const [itemState, setItemState] = React.useState(null);
+  const itemActivity = itemState && itemState.isEnabled ? "Active" : "Inactive";
+
+  React.useEffect(() => {
+    if (!itemState) {
+      handleFetchItem();
+    }
+  }, []);
+
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      handleFetchItem();
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
+  React.useEffect(() => {
+    if (error) {
+      errorAlert();
+      setError(null);
+    }
+  }, [editItemError]);
+
+  const handleFetchItem = () => {
+    fetch(`http://${config.ipAddress}:3000/api/v1.0/kitchen/item/${itemId}`, {
+      method: "get",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        setItemState(data);
+      })
+      .catch((e) => {
+        setError("Some server error!");
+        throw new Error("Server Error", e);
+      });
+  };
 
   const handleDeleteItem = () => {
     Alert.alert(
@@ -25,8 +67,12 @@ function ItemDetailsScreen({ navigation }) {
     );
   };
 
+  const handleEditItem = () => {
+    navigation.navigate("Edit Item");
+  };
+
   const deleteItem = () => {
-    fetch(`http://${config.ipAddress}:3000/api/v1.0/kitchen/item/${item.id}`, {
+    fetch(`http://${config.ipAddress}:3000/api/v1.0/kitchen/item/${itemId}`, {
       method: "delete",
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -44,13 +90,21 @@ function ItemDetailsScreen({ navigation }) {
       });
   };
 
+  const errorAlert = () =>
+    Alert.alert(
+      "Error",
+      `${error}`,
+      [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+      { cancelable: true }
+    );
+
   const itemsRows = (
     <View style={styles.itemContainer}>
       <Text style={styles.itemText}>
-        Item Price: {item ? item.itemPrice : ""}
+        Item Price: {itemState ? itemState.itemPrice : ""}
       </Text>
       <Text style={styles.itemText}>
-        Item Description: {item ? item.itemDesc : ""}
+        Item Description: {itemState ? itemState.itemDesc : ""}
       </Text>
       <Text style={styles.itemText}>Item Activity: {itemActivity}</Text>
     </View>
@@ -59,21 +113,29 @@ function ItemDetailsScreen({ navigation }) {
     <View style={styles.container}>
       <View style={styles.headerContainer}>
         <Text style={{ fontSize: 25, fontWeight: "bold" }}>
-          {item ? item.itemName : ""}
+          {itemState ? itemState.itemName : ""}
         </Text>
       </View>
-      {item ? itemsRows : null}
+      {itemState ? itemsRows : null}
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.editItem}>
+        <TouchableOpacity style={styles.editItem} onPress={handleEditItem}>
           <Text
-            style={{ color: "white", alignSelf: "center", fontWeight: "bold" }}
+            style={{
+              color: "white",
+              alignSelf: "center",
+              fontWeight: "bold",
+            }}
           >
             Edit Item
           </Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.deleteItem} onPress={handleDeleteItem}>
           <Text
-            style={{ color: "white", alignSelf: "center", fontWeight: "bold" }}
+            style={{
+              color: "white",
+              alignSelf: "center",
+              fontWeight: "bold",
+            }}
           >
             Delete Item
           </Text>
@@ -113,7 +175,6 @@ const styles = StyleSheet.create({
     color: "black",
   },
   buttonContainer: {
-    // backgroundColor: "blue",
     justifyContent: "center",
     paddingHorizontal: 30,
     flex: 1,
@@ -133,9 +194,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 10,
-  },
-  error: {
-    color: "red",
   },
 });
 
