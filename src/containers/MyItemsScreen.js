@@ -70,7 +70,7 @@ function MyItemsScreen({ navigation }) {
 
   const handleItemOnClick = (item) => {
     navigation.navigate("ItemDetails", {
-      item,
+      itemId: item.id,
       accessToken,
     });
   };
@@ -210,7 +210,8 @@ const styles = StyleSheet.create({
     },
   },
   inactiveItemContainer: {
-    backgroundColor: "#d1d1d1",
+    backgroundColor: "white",
+    opacity: 0.3,
     padding: 20,
     marginHorizontal: 30,
     marginVertical: 10,
