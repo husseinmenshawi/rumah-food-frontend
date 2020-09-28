@@ -35,6 +35,13 @@ function EditItemScreen({ navigation }) {
     return unsubscribe;
   }, [navigation]);
 
+  React.useEffect(() => {
+    if (editItemError) {
+      errorAlert();
+      setEditItemError(null);
+    }
+  }, [editItemError]);
+
   const handleFetchItem = () => {
     fetch(`http://${config.ipAddress}:3000/api/v1.0/kitchen/item/${itemId}`, {
       method: "get",
@@ -54,13 +61,6 @@ function EditItemScreen({ navigation }) {
         throw new Error("Server Error", e);
       });
   };
-
-  React.useEffect(() => {
-    if (editItemError) {
-      errorAlert();
-      setEditItemError(null);
-    }
-  }, [editItemError]);
 
   let initialValues = {
     itemName: "",
@@ -87,7 +87,7 @@ function EditItemScreen({ navigation }) {
     isEnabled: yup.boolean().required("Item Activity is required"),
   });
 
-  const handleEditItem = (values, actions) => {
+  const handleEditItem = (values) => {
     const { itemName, itemPrice, itemDesc, isEnabled } = values;
     console.log("VALUES: ", values);
     fetch(`http://${config.ipAddress}:3000/api/v1.0/kitchen/item/${itemId}`, {
@@ -118,15 +118,15 @@ function EditItemScreen({ navigation }) {
       "Editing Item Error",
       `${editItemError}`,
       [{ text: "OK", onPress: () => console.log("OK Pressed") }],
-      { cancelable: false }
+      { cancelable: true }
     );
   return (
     <View style={styles.container}>
       {itemState && (
         <Formik
           initialValues={initialValues}
-          onSubmit={(values, actions) => {
-            handleEditItem(values, actions);
+          onSubmit={(values) => {
+            handleEditItem(values);
           }}
           validationSchema={validationSchema}
         >

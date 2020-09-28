@@ -52,7 +52,7 @@ export default function SellerRegisterScreen({ navigation }) {
     navigation.navigate("Start");
   };
 
-  const handleRegister = (values, actions) => {
+  const handleRegister = (values) => {
     const { name, email, password, phoneNumber, kitchenName } = values;
     const roleId = 2;
     fetch(`http://${config.ipAddress}:3000/api/v1.0/user`, {
@@ -96,8 +96,8 @@ export default function SellerRegisterScreen({ navigation }) {
       </View>
       <Formik
         initialValues={initialValues}
-        onSubmit={(values, actions) => {
-          handleRegister(values, actions);
+        onSubmit={(values) => {
+          handleRegister(values);
         }}
         validationSchema={validationSchema}
       >

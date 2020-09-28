@@ -41,7 +41,7 @@ export default function SellerLoginScreen({ route, navigation }) {
     navigation.navigate("Start");
   };
 
-  const handleLogin = (values, actions) => {
+  const handleLogin = (values) => {
     const { email, password } = values;
     const roleId = 2;
     fetch(`http://${config.ipAddress}:3000/api/v1.0/gatekeeper/me/token`, {
@@ -94,8 +94,8 @@ export default function SellerLoginScreen({ route, navigation }) {
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
-        onSubmit={(values, actions) => {
-          handleLogin(values, actions);
+        onSubmit={(values) => {
+          handleLogin(values);
         }}
       >
         {(formikProps) => (
