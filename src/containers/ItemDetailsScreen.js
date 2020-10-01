@@ -30,7 +30,7 @@ function ItemDetailsScreen({ navigation }) {
       errorAlert();
       setError(null);
     }
-  }, [editItemError]);
+  }, [error]);
 
   const handleFetchItem = () => {
     fetch(`http://${config.ipAddress}:3000/api/v1.0/kitchen/item/${itemId}`, {
