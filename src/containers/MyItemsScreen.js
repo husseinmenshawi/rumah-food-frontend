@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   FlatList,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import { NetworkContext } from "../../network-context";
 import config from "../../config";
@@ -18,6 +19,7 @@ function MyItemsScreen({ navigation }) {
   const { accessToken, kitchenId } = params;
   const [error, setError] = React.useState(null);
   const [items, setItems] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
   const addIconDisabled = items.length === 10;
 
   React.useEffect(() => {
@@ -46,6 +48,7 @@ function MyItemsScreen({ navigation }) {
   }, [error]);
 
   const fetchItems = () => {
+    setLoading(true);
     fetch(
       `http://${config.ipAddress}:3000/api/v1.0/kitchen/item/me?kitchenId=${kitchenId}`,
       {
@@ -60,6 +63,7 @@ function MyItemsScreen({ navigation }) {
         return res.json();
       })
       .then((data) => {
+        setLoading(false);
         setItems(data);
       })
       .catch((e) => {
@@ -116,6 +120,13 @@ function MyItemsScreen({ navigation }) {
       renderItem={renderItem}
       keyExtractor={(item) => item.id}
     />
+  );
+
+  const loadingIndicator = (
+    <View style={styles.loadingView}>
+      <ActivityIndicator size="large" />
+      <Text>Loading Items...</Text>
+    </View>
   );
 
   return (
@@ -179,7 +190,7 @@ function MyItemsScreen({ navigation }) {
           </TouchableOpacity>
         </View>
       </View>
-      {items.length !== 0 ? itemsRows : null}
+      {loading ? loadingIndicator : itemsRows}
     </View>
   );
 }
@@ -244,6 +255,11 @@ const styles = StyleSheet.create({
   },
   error: {
     color: "red",
+  },
+  loadingView: {
+    paddingTop: 50,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

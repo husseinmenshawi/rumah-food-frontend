@@ -8,6 +8,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 
 import { Formik } from "formik";
@@ -16,6 +17,7 @@ import config from "../../config";
 
 export default function SellerLoginScreen({ route, navigation }) {
   const [loginError, setLoginError] = React.useState(null);
+  const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
     if (loginError) {
@@ -23,6 +25,7 @@ export default function SellerLoginScreen({ route, navigation }) {
       setLoginError(null);
     }
   }, [loginError]);
+
   const validationSchema = yup.object().shape({
     email: yup.string().required("Email is required").email().label("Email"),
     password: yup.string().required("Password is required"),
@@ -44,6 +47,7 @@ export default function SellerLoginScreen({ route, navigation }) {
   const handleLogin = (values) => {
     const { email, password } = values;
     const roleId = 2;
+    setLoading(true);
     fetch(`http://${config.ipAddress}:3000/api/v1.0/gatekeeper/me/token`, {
       method: "post",
       headers: {
@@ -63,6 +67,7 @@ export default function SellerLoginScreen({ route, navigation }) {
         }
       })
       .then((data) => {
+        setLoading(false);
         navigation.navigate("App", {
           accessToken: data.accessToken,
           kitchenId: data.kitchenId,
@@ -83,59 +88,75 @@ export default function SellerLoginScreen({ route, navigation }) {
       { cancelable: false }
     );
 
+  const loadingIndicator = (
+    <View style={styles.loadingView}>
+      <ActivityIndicator size="large" />
+      <Text>Logging in...</Text>
+    </View>
+  );
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS == "ios" ? "padding" : "height"}
       style={styles.container}
     >
-      <View style={styles.titleContainer}>
-        <Text style={styles.title}> Seller</Text>
-      </View>
-      <Formik
-        initialValues={initialValues}
-        validationSchema={validationSchema}
-        onSubmit={(values) => {
-          handleLogin(values);
-        }}
-      >
-        {(formikProps) => (
-          <View style={styles.loginContainer}>
-            <Text style={styles.text}>Email</Text>
-            <TextInput
-              style={styles.textInput}
-              onChangeText={formikProps.handleChange("email")}
-              onBlur={formikProps.handleBlur("email")}
-            />
-            <Text style={styles.inputError}>
-              {formikProps.touched.email && formikProps.errors.email}
-            </Text>
-            <Text style={styles.text}>Password</Text>
-            <TextInput
-              secureTextEntry
-              style={styles.textInput}
-              onChangeText={formikProps.handleChange("password")}
-              onBlur={formikProps.handleBlur("password")}
-            />
-            <Text style={styles.inputError}>
-              {formikProps.touched.password && formikProps.errors.password}
-            </Text>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={formikProps.handleSubmit}
-            >
-              <Text style={{ color: "black" }}> Login </Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={navigateSellerRegisterScreen}>
-              <Text style={styles.registerText}>
-                Don't have an account? Click here to register
+      {loading ? null : (
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}> Seller</Text>
+        </View>
+      )}
+
+      {loading ? (
+        loadingIndicator
+      ) : (
+        <Formik
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+          onSubmit={(values) => {
+            handleLogin(values);
+          }}
+        >
+          {(formikProps) => (
+            <View style={styles.loginContainer}>
+              <Text style={styles.text}>Email</Text>
+              <TextInput
+                style={styles.textInput}
+                onChangeText={formikProps.handleChange("email")}
+                onBlur={formikProps.handleBlur("email")}
+              />
+              <Text style={styles.inputError}>
+                {formikProps.touched.email && formikProps.errors.email}
               </Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={navigateLandingScreen}>
-              <Text style={styles.registerText}>Not a Seller? Click here</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      </Formik>
+              <Text style={styles.text}>Password</Text>
+              <TextInput
+                secureTextEntry
+                style={styles.textInput}
+                onChangeText={formikProps.handleChange("password")}
+                onBlur={formikProps.handleBlur("password")}
+              />
+              <Text style={styles.inputError}>
+                {formikProps.touched.password && formikProps.errors.password}
+              </Text>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={formikProps.handleSubmit}
+              >
+                <Text style={{ color: "black" }}> Login </Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={navigateSellerRegisterScreen}>
+                <Text style={styles.registerText}>
+                  Don't have an account? Click here to register
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={navigateLandingScreen}>
+                <Text style={styles.registerText}>
+                  Not a Seller? Click here
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </Formik>
+      )}
     </KeyboardAvoidingView>
   );
 }
@@ -184,5 +205,9 @@ const styles = StyleSheet.create({
   },
   inputError: {
     color: "red",
+  },
+  loadingView: {
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

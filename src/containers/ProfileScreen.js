@@ -1,6 +1,12 @@
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 import { NetworkContext } from "../../network-context";
 import config from "../../config";
 
@@ -10,6 +16,7 @@ function ProfileScreen({ navigation }) {
   const roleName = roleId == 2 ? "Seller" : "Buyer";
   const [error, setError] = React.useState(null);
   const [user, setUser] = React.useState(null);
+  const [loading, setLoading] = React.useState(false);
   React.useEffect(() => {
     if (!user) {
       fetchProfileDetails();
@@ -17,6 +24,7 @@ function ProfileScreen({ navigation }) {
   }, []);
 
   const fetchProfileDetails = () => {
+    setLoading(true);
     fetch(`http://${config.ipAddress}:3000/api/v1.0/gatekeeper/me`, {
       method: "get",
       headers: {
@@ -28,6 +36,7 @@ function ProfileScreen({ navigation }) {
         return res.json();
       })
       .then((data) => {
+        setLoading(false);
         setUser(data);
       })
       .catch((e) => {
@@ -79,12 +88,20 @@ function ProfileScreen({ navigation }) {
       <Text style={styles.detailsText}>Role: {roleName}</Text>
     </View>
   );
+
+  const loadingIndicator = (
+    <View style={styles.loadingView}>
+      <ActivityIndicator size="large" />
+      <Text>Loading Profile...</Text>
+    </View>
+  );
+
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
         <Text style={{ fontSize: 25, fontWeight: "bold" }}>Profile</Text>
       </View>
-      {user ? details : null}
+      {loading ? loadingIndicator : details}
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.logout} onPress={handleLogout}>
           <Text
@@ -138,6 +155,11 @@ const styles = StyleSheet.create({
   },
   error: {
     color: "red",
+  },
+  loadingView: {
+    paddingTop: 50,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

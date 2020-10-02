@@ -1,6 +1,13 @@
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { StyleSheet, Text, View, TouchableOpacity, Alert } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
 import { NetworkContext } from "../../network-context";
 import config from "../../config";
 
@@ -9,6 +16,7 @@ function ItemDetailsScreen({ navigation }) {
   const { itemId, accessToken } = params;
   const [error, setError] = React.useState(null);
   const [itemState, setItemState] = React.useState(null);
+  const [loading, setLoading] = React.useState(false);
   const itemActivity = itemState && itemState.isEnabled ? "Active" : "Inactive";
 
   React.useEffect(() => {
@@ -33,6 +41,7 @@ function ItemDetailsScreen({ navigation }) {
   }, [error]);
 
   const handleFetchItem = () => {
+    setLoading(true);
     fetch(`http://${config.ipAddress}:3000/api/v1.0/kitchen/item/${itemId}`, {
       method: "get",
       headers: {
@@ -44,6 +53,7 @@ function ItemDetailsScreen({ navigation }) {
         return res.json();
       })
       .then((data) => {
+        setLoading(false);
         setItemState(data);
       })
       .catch((e) => {
@@ -98,6 +108,12 @@ function ItemDetailsScreen({ navigation }) {
       { cancelable: true }
     );
 
+  const loadingIndicator = (
+    <View style={styles.loadingView}>
+      <ActivityIndicator size="large" />
+      <Text>Loading Item...</Text>
+    </View>
+  );
   const itemsRows = (
     <View style={styles.itemContainer}>
       <Text style={styles.itemText}>
@@ -116,7 +132,7 @@ function ItemDetailsScreen({ navigation }) {
           {itemState ? itemState.itemName : ""}
         </Text>
       </View>
-      {itemState ? itemsRows : null}
+      {loading ? loadingIndicator : itemsRows}
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.editItem} onPress={handleEditItem}>
           <Text
@@ -194,6 +210,11 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 10,
+  },
+  loadingView: {
+    paddingTop: 50,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 
