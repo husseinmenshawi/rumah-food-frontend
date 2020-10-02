@@ -6,9 +6,12 @@ import {
   View,
   TouchableOpacity,
   ActivityIndicator,
+  ScrollView,
 } from "react-native";
 import { NetworkContext } from "../../network-context";
 import config from "../../config";
+
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 function ProfileScreen({ navigation }) {
   const params = React.useContext(NetworkContext);
@@ -22,6 +25,14 @@ function ProfileScreen({ navigation }) {
       fetchProfileDetails();
     }
   }, []);
+
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      fetchProfileDetails();
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   const fetchProfileDetails = () => {
     setLoading(true);
@@ -64,14 +75,15 @@ function ProfileScreen({ navigation }) {
       });
   };
 
-  const details = (
+  const handleEditProfile = () => {
+    navigation.navigate("EditProfile", {
+      accessToken,
+    });
+  };
+
+  const profileDetails = (
     <View style={styles.detailsContainer}>
       <Text style={styles.detailsText}>Name: {user ? user.name : ""}</Text>
-      {roleId === 2 && (
-        <Text style={styles.detailsText}>
-          Kitchen Name: {user ? user.Kitchen.name : ""}
-        </Text>
-      )}
       <Text style={styles.detailsText}>Email: {user ? user.email : ""}</Text>
       <Text style={styles.detailsText}>
         Phone Number: {user ? user.phoneNumber : ""}
@@ -86,6 +98,48 @@ function ProfileScreen({ navigation }) {
         Address Line 3: {user ? user.addressLine3 : ""}
       </Text>
       <Text style={styles.detailsText}>Role: {roleName}</Text>
+      <TouchableOpacity
+        style={{ alignSelf: "flex-end" }}
+        onPress={handleEditProfile}
+      >
+        <Ionicons
+          style={{ color: "black" }}
+          name="md-create"
+          size={30}
+          color="black"
+        />
+      </TouchableOpacity>
+    </View>
+  );
+
+  const kitchenDetails = (
+    <View style={styles.detailsContainer}>
+      <Text style={styles.detailsText}>
+        Kitchen Name: {user ? user.Kitchen.name : ""}
+      </Text>
+      <Text style={styles.detailsText}>
+        Email: {user ? user.Kitchen.email : ""}
+      </Text>
+      <Text style={styles.detailsText}>
+        Phone Number: {user ? user.Kitchen.phoneNumber : ""}
+      </Text>
+      <Text style={styles.detailsText}>
+        Address Line 1: {user ? user.Kitchen.addressLine1 : ""}
+      </Text>
+      <Text style={styles.detailsText}>
+        Address Line 2: {user ? user.Kitchen.addressLine2 : ""}
+      </Text>
+      <Text style={styles.detailsText}>
+        Address Line 3: {user ? user.Kitchen.addressLine3 : ""}
+      </Text>
+      <TouchableOpacity style={{ alignSelf: "flex-end" }}>
+        <Ionicons
+          style={{ color: "black" }}
+          name="md-create"
+          size={30}
+          color="black"
+        />
+      </TouchableOpacity>
     </View>
   );
 
@@ -97,43 +151,63 @@ function ProfileScreen({ navigation }) {
   );
 
   return (
-    <View style={styles.container}>
-      <View style={styles.headerContainer}>
-        <Text style={{ fontSize: 25, fontWeight: "bold" }}>Profile</Text>
+    <ScrollView>
+      <View style={styles.container}>
+        <View style={styles.headerContainer}>
+          <Text style={{ fontSize: 25, fontWeight: "bold" }}>Profile</Text>
+        </View>
+        {loading ? loadingIndicator : profileDetails}
+        {roleId === 2 && (
+          <View style={styles.headerContainer}>
+            <Text style={{ fontSize: 25, fontWeight: "bold" }}>Kitchen</Text>
+          </View>
+        )}
+        {!loading && roleId === 2 && kitchenDetails}
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.logout} onPress={handleLogout}>
+            <Text
+              style={{
+                color: "white",
+                alignSelf: "center",
+                fontWeight: "bold",
+              }}
+            >
+              Logout
+            </Text>
+          </TouchableOpacity>
+          <Text style={styles.error}>{error ? error : null}</Text>
+        </View>
       </View>
-      {loading ? loadingIndicator : details}
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.logout} onPress={handleLogout}>
-          <Text
-            style={{ color: "white", alignSelf: "center", fontWeight: "bold" }}
-          >
-            Logout
-          </Text>
-        </TouchableOpacity>
-        <Text style={styles.error}>{error ? error : null}</Text>
-      </View>
-    </View>
+    </ScrollView>
   );
 }
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
-    paddingTop: 20,
     // flexDirection: "column",
     // alignItems: "center",
     // justifyContent: "center",
   },
   headerContainer: {
     // backgroundColor: "red",
-    paddingTop: 100,
+    paddingTop: 50,
     paddingHorizontal: 30,
     // flex: 1,
   },
   detailsContainer: {
-    paddingTop: 20,
-    // backgroundColor: "green",
-    paddingHorizontal: 30,
+    backgroundColor: "white",
+    padding: 10,
+    marginHorizontal: 30,
+    marginVertical: 10,
+    borderRadius: 10,
+    shadowColor: "black",
+    shadowOpacity: 0.5,
+    shadowRadius: 2,
+    shadowOffset: {
+      height: 1,
+      width: 1,
+    },
   },
   detailsText: {
     paddingVertical: 5,

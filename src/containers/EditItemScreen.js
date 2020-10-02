@@ -89,7 +89,6 @@ function EditItemScreen({ navigation }) {
 
   const handleEditItem = (values) => {
     const { itemName, itemPrice, itemDesc, isEnabled } = values;
-    console.log("VALUES: ", values);
     fetch(`http://${config.ipAddress}:3000/api/v1.0/kitchen/item/${itemId}`, {
       method: "patch",
       headers: {
