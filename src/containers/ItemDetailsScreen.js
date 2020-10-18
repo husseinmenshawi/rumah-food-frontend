@@ -5,6 +5,7 @@ import {
   Text,
   View,
   TouchableOpacity,
+  FlatList,
   Alert,
   ActivityIndicator,
 } from "react-native";
@@ -16,6 +17,7 @@ function ItemDetailsScreen({ navigation }) {
   const { itemId, accessToken } = params;
   const [error, setError] = React.useState(null);
   const [itemState, setItemState] = React.useState(null);
+  const [itemFlavours, setItemFlavours] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
   const itemActivity = itemState && itemState.isEnabled ? "Active" : "Inactive";
 
@@ -55,6 +57,7 @@ function ItemDetailsScreen({ navigation }) {
       .then((data) => {
         setLoading(false);
         setItemState(data);
+        setItemFlavours(data.Flavours);
       })
       .catch((e) => {
         setError("Some server error!");
@@ -114,6 +117,13 @@ function ItemDetailsScreen({ navigation }) {
       <Text>Loading Item...</Text>
     </View>
   );
+
+  const Item = ({ item }) => (
+    <Text style={styles.itemText}>{item.flavourName}</Text>
+  );
+
+  const renderItem = ({ item }) => <Item item={item} />;
+
   const itemsRows = (
     <View style={styles.itemContainer}>
       <Text style={styles.itemText}>
@@ -123,6 +133,12 @@ function ItemDetailsScreen({ navigation }) {
         Item Description: {itemState ? itemState.itemDesc : ""}
       </Text>
       <Text style={styles.itemText}>Item Activity: {itemActivity}</Text>
+      <FlatList
+        data={itemFlavours}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+      />
+      {/* <Text style={styles.itemText}>Flavours: {map.}</Text> */}
     </View>
   );
   return (

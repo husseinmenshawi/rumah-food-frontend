@@ -75,8 +75,8 @@ export default function SellerLoginScreen({ route, navigation }) {
         });
       })
       .catch((error) => {
+        setLoading(false);
         setLoginError(error.message);
-        // errorAlert();
       });
   };
 

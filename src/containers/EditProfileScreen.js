@@ -147,11 +147,10 @@ function EditProfileScreen({ navigation }) {
   const loadingIndicator = (
     <View style={styles.loadingView}>
       <ActivityIndicator size="large" />
-      <Text>Loading...</Text>
     </View>
   );
   return (
-    <ScrollView>
+    <ScrollView style={styles.background}>
       <View style={styles.container}>
         {loading ? (
           loadingIndicator
@@ -240,6 +239,9 @@ function EditProfileScreen({ navigation }) {
   );
 }
 const styles = StyleSheet.create({
+  background: {
+    backgroundColor: "white",
+  },
   container: {
     flex: 1,
     backgroundColor: "white",
@@ -273,7 +275,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   loadingView: {
-    marginVertical: windowHeight / 2,
+    marginVertical: windowHeight / 3,
     justifyContent: "center",
     alignItems: "center",
     height: "100%",

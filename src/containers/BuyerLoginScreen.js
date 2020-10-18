@@ -73,8 +73,8 @@ export default function BuyerLoginScreen({ navigation }) {
         });
       })
       .catch((error) => {
+        setLoading(false);
         setLoginError(error.message);
-        // errorAlert();
       });
   };
 

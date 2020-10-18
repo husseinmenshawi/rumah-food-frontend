@@ -146,12 +146,11 @@ function ProfileScreen({ navigation }) {
   const loadingIndicator = (
     <View style={styles.loadingView}>
       <ActivityIndicator size="large" />
-      <Text>Loading Profile...</Text>
     </View>
   );
 
   return (
-    <ScrollView>
+    <ScrollView style={styles.background}>
       <View style={styles.container}>
         <View style={styles.headerContainer}>
           <Text style={{ fontSize: 25, fontWeight: "bold" }}>Profile</Text>
@@ -162,7 +161,11 @@ function ProfileScreen({ navigation }) {
             <Text style={{ fontSize: 25, fontWeight: "bold" }}>Kitchen</Text>
           </View>
         )}
-        {!loading && roleId === 2 && kitchenDetails}
+        {loading && roleId === 2
+          ? loadingIndicator
+          : !loading && roleId == 2
+          ? kitchenDetails
+          : null}
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.logout} onPress={handleLogout}>
             <Text
@@ -182,18 +185,15 @@ function ProfileScreen({ navigation }) {
   );
 }
 const styles = StyleSheet.create({
+  background: {
+    backgroundColor: "white",
+  },
   container: {
     flex: 1,
-    backgroundColor: "white",
-    // flexDirection: "column",
-    // alignItems: "center",
-    // justifyContent: "center",
   },
   headerContainer: {
-    // backgroundColor: "red",
     paddingTop: 50,
     paddingHorizontal: 30,
-    // flex: 1,
   },
   detailsContainer: {
     backgroundColor: "white",

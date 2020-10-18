@@ -5,6 +5,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import HomeScreen from "../containers/HomeScreen";
 import MyItemsScreen from "../containers/MyItemsScreen";
 import ProfileScreen from "../containers/ProfileScreen";
+// import LoadingScreen from "../containers/LoadingScreen";
 
 import { NetworkContext } from "../../network-context";
 
