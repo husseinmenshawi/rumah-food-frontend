@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   FlatList,
 } from "react-native";
+import CheckBox from "@react-native-community/checkbox";
 import { Formik } from "formik";
 import * as yup from "yup";
 import config from "../../config";
@@ -15,6 +16,7 @@ import { NetworkContext } from "../../network-context";
 
 function AddItemScreen({ navigation }) {
   const [addItemError, setAddItemError] = React.useState(null);
+  const [toggleCheckBox, setToggleCheckBox] = React.useState(false);
   const params = React.useContext(NetworkContext);
   const { accessToken, kitchenId } = params;
 
@@ -107,6 +109,11 @@ function AddItemScreen({ navigation }) {
             <TextInput
               style={styles.textInput}
               onChangeText={formikProps.handleChange("itemPrice")}
+            />
+            <CheckBox
+              disabled={false}
+              value={toggleCheckBox}
+              onValueChange={(newValue) => setToggleCheckBox(newValue)}
             />
             <Text style={styles.inputError}>
               {formikProps.touched.itemPrice && formikProps.errors.itemPrice}
