@@ -7,8 +7,10 @@ import {
   TextInput,
   TouchableOpacity,
   Switch,
+  ScrollView,
   Alert,
 } from "react-native";
+import { CheckBox } from "react-native-elements";
 import { Formik } from "formik";
 import * as yup from "yup";
 import config from "../../config";
@@ -67,14 +69,53 @@ function EditItemScreen({ navigation }) {
     itemPrice: "",
     itemDesc: "",
     isEnabled: "",
+    //TODO: find a better way to implement a checkbox in this form.
+    flavours: [
+      {
+        id: 1,
+        name: "Vanilla",
+        checked: false,
+      },
+      {
+        id: 2,
+        name: "Chocholate",
+        checked: false,
+      },
+      {
+        id: 3,
+        name: "Butter",
+        checked: false,
+      },
+      {
+        id: 4,
+        name: "Strawberry",
+        checked: false,
+      },
+      {
+        id: 5,
+        name: "Green Tea",
+        checked: false,
+      },
+    ],
   };
 
   if (itemState) {
+    const flavourIds = itemState.Flavours.map(
+      (x) => x.KitchenItemFlavours.flavourId
+    );
+    const initialValueFlavours = initialValues.flavours;
+    const filtered = initialValueFlavours.map((x) => {
+      if (flavourIds.includes(x.id)) {
+        x.checked = true;
+      }
+      return x;
+    });
     initialValues = {
       itemName: itemState.itemName,
       itemPrice: String(itemState.itemPrice),
       itemDesc: itemState.itemDesc,
       isEnabled: itemState.isEnabled,
+      flavours: filtered,
     };
   }
 
@@ -85,10 +126,17 @@ function EditItemScreen({ navigation }) {
       .required("Item price is required"),
     itemDesc: yup.string().required("Item description is required"),
     isEnabled: yup.boolean().required("Item Activity is required"),
+    flavours: yup.array().required("At least one flavour must be selected"),
   });
 
   const handleEditItem = (values) => {
-    const { itemName, itemPrice, itemDesc, isEnabled } = values;
+    const { itemName, itemPrice, itemDesc, isEnabled, flavours } = values;
+
+    const selectFlavours = flavours.filter((x) => {
+      return x.checked == true;
+    });
+    const selectFlavourIds = selectFlavours.map((x) => x.id);
+
     fetch(`http://${config.ipAddress}:3000/api/v1.0/kitchen/item/${itemId}`, {
       method: "patch",
       headers: {
@@ -100,6 +148,7 @@ function EditItemScreen({ navigation }) {
         itemPrice,
         itemDesc,
         isEnabled,
+        flavours: selectFlavourIds,
       }),
     })
       .then((res) => {
@@ -120,68 +169,102 @@ function EditItemScreen({ navigation }) {
       { cancelable: true }
     );
   return (
-    <View style={styles.container}>
-      {itemState && (
-        <Formik
-          initialValues={initialValues}
-          onSubmit={(values) => {
-            handleEditItem(values);
-          }}
-          validationSchema={validationSchema}
-        >
-          {(formikProps) => (
-            <View style={styles.editItemContainer}>
-              <Text style={styles.text}>Item Name</Text>
-              <TextInput
-                style={styles.textInput}
-                onChangeText={formikProps.handleChange("itemName")}
-                value={formikProps.values.itemName}
-              />
-              <Text style={styles.inputError}>
-                {formikProps.touched.itemName && formikProps.errors.itemName}
-              </Text>
-              <Text style={styles.text}>Item Description</Text>
-              <TextInput
-                style={styles.textInput}
-                onChangeText={formikProps.handleChange("itemDesc")}
-                value={formikProps.values.itemDesc}
-              />
-              <Text style={styles.inputError}>
-                {formikProps.touched.itemDesc && formikProps.errors.itemDesc}
-              </Text>
-              <Text style={styles.text}>Item Price</Text>
-              <TextInput
-                style={styles.textInput}
-                onChangeText={formikProps.handleChange("itemPrice")}
-                value={formikProps.values.itemPrice}
-              />
-              <Text style={styles.inputError}>
-                {formikProps.touched.itemPrice && formikProps.errors.itemPrice}
-              </Text>
-              <Text style={styles.text}>Item Activity</Text>
-              <Switch
-                trackColor={{ false: "#767577", true: "#81b0ff" }}
-                value={formikProps.values.isEnabled}
-                onValueChange={(value) =>
-                  formikProps.setFieldValue("isEnabled", value)
-                }
-              />
-              <TouchableOpacity
-                style={styles.editButton}
-                onPress={formikProps.handleSubmit}
-              >
-                <Text style={{ color: "white", fontWeight: "bold" }}>
-                  Update
+    <ScrollView style={styles.background}>
+      <View style={styles.container}>
+        {itemState && (
+          <Formik
+            initialValues={initialValues}
+            onSubmit={(values) => {
+              handleEditItem(values);
+            }}
+            validationSchema={validationSchema}
+          >
+            {(formikProps) => (
+              <View style={styles.editItemContainer}>
+                <Text style={styles.text}>Item Name</Text>
+                <TextInput
+                  style={styles.textInput}
+                  onChangeText={formikProps.handleChange("itemName")}
+                  value={formikProps.values.itemName}
+                />
+                <Text style={styles.inputError}>
+                  {formikProps.touched.itemName && formikProps.errors.itemName}
                 </Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        </Formik>
-      )}
-    </View>
+                <Text style={styles.text}>Item Description</Text>
+                <TextInput
+                  style={styles.textInput}
+                  onChangeText={formikProps.handleChange("itemDesc")}
+                  value={formikProps.values.itemDesc}
+                />
+                <Text style={styles.inputError}>
+                  {formikProps.touched.itemDesc && formikProps.errors.itemDesc}
+                </Text>
+                <Text style={styles.text}>Item Price</Text>
+                <TextInput
+                  style={styles.textInput}
+                  onChangeText={formikProps.handleChange("itemPrice")}
+                  value={formikProps.values.itemPrice}
+                />
+                <Text style={styles.inputError}>
+                  {formikProps.touched.itemPrice &&
+                    formikProps.errors.itemPrice}
+                </Text>
+                <Text style={styles.text}>Item Activity</Text>
+                <Switch
+                  trackColor={{ false: "#767577", true: "#81b0ff" }}
+                  value={formikProps.values.isEnabled}
+                  onValueChange={(value) =>
+                    formikProps.setFieldValue("isEnabled", value)
+                  }
+                />
+                <Text style={styles.text}>Flavours</Text>
+                {initialValues.flavours.length != 0 &&
+                  initialValues.flavours.map((x) => {
+                    const flavour = formikProps.values.flavours.find(
+                      (y) => y.id == x.id
+                    );
+                    return (
+                      <CheckBox
+                        key={x.id}
+                        title={`${x.name}`}
+                        checked={flavour.checked}
+                        containerStyle={styles.checkBox}
+                        onPress={() => {
+                          const index = formikProps.values.flavours.indexOf(
+                            flavour
+                          );
+                          formikProps.values.flavours[
+                            index
+                          ].checked = !formikProps.values.flavours[index]
+                            .checked;
+                          formikProps.setFieldValue(
+                            "flavours",
+                            formikProps.values.flavours
+                          );
+                        }}
+                      />
+                    );
+                  })}
+                <TouchableOpacity
+                  style={styles.editButton}
+                  onPress={formikProps.handleSubmit}
+                >
+                  <Text style={{ color: "white", fontWeight: "bold" }}>
+                    Update
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </Formik>
+        )}
+      </View>
+    </ScrollView>
   );
 }
 const styles = StyleSheet.create({
+  background: {
+    backgroundColor: "white",
+  },
   container: {
     flex: 1,
     backgroundColor: "white",
@@ -212,6 +295,11 @@ const styles = StyleSheet.create({
   inputError: {
     color: "red",
     marginHorizontal: 10,
+  },
+  checkBox: {
+    backgroundColor: "white",
+    borderColor: "white",
+    paddingVertical: 1,
   },
 });
 
