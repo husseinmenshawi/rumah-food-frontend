@@ -5,6 +5,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import HomeScreen from "../containers/HomeScreen";
 import MyItemsScreen from "../containers/MyItemsScreen";
 import ProfileScreen from "../containers/ProfileScreen";
+import CapacitiesScreen from "../containers/CapacitiesScreen";
 // import LoadingScreen from "../containers/LoadingScreen";
 
 import { NetworkContext } from "../../network-context";
@@ -23,10 +24,12 @@ export default function App({ route, navigation }) {
 
             if (route.name === "Home") {
               iconName = "ios-home";
-            } else if (route.name === "MyList") {
+            } else if (route.name === "My List") {
               iconName = "ios-list";
             } else if (route.name === "Profile") {
               iconName = "ios-person";
+            } else if (route.name === "Capacities") {
+              iconName = "md-calendar";
             }
 
             return <Ionicons name={iconName} size={size} color={color} />;
@@ -38,7 +41,12 @@ export default function App({ route, navigation }) {
         }}
       >
         <Tab.Screen name="Home" component={HomeScreen} />
-        {roleId === 2 && <Tab.Screen name="MyList" component={MyItemsScreen} />}
+        {roleId === 2 && (
+          <Tab.Screen name="Capacities" component={CapacitiesScreen} />
+        )}
+        {roleId === 2 && (
+          <Tab.Screen name="My List" component={MyItemsScreen} />
+        )}
         <Tab.Screen name="Profile" component={ProfileScreen} />
       </Tab.Navigator>
     </NetworkContext.Provider>

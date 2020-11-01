@@ -13,7 +13,7 @@ import { NetworkContext } from "../../network-context";
 import config from "../../config";
 
 import Ionicons from "@expo/vector-icons/Ionicons";
-
+//TODO: whenever an item is click a warning is shown:  Failed child context type: Invalid child context `virtualizedCell.cellKey` of type `number` supplied to `CellRenderer`, expected `string`.
 function MyItemsScreen({ navigation }) {
   const params = React.useContext(NetworkContext);
   const { accessToken, kitchenId } = params;
