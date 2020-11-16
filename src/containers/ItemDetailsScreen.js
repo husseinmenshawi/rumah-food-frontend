@@ -1,4 +1,3 @@
-import { StatusBar } from "expo-status-bar";
 import React from "react";
 import {
   StyleSheet,
@@ -8,15 +7,45 @@ import {
   FlatList,
   Alert,
   ActivityIndicator,
+  ScrollView,
+  Image,
 } from "react-native";
+
 import { NetworkContext } from "../../network-context";
 import config from "../../config";
 
 function ItemDetailsScreen({ navigation }) {
+  // const chars =
+  //   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+  // const Base64 = {
+  //   btoa: (input = "") => {
+  //     let str = input;
+  //     let output = "";
+
+  //     for (
+  //       let block = 0, charCode, i = 0, map = chars;
+  //       str.charAt(i | 0) || ((map = "="), i % 1);
+  //       output += map.charAt(63 & (block >> (8 - (i % 1) * 8)))
+  //     ) {
+  //       charCode = str.charCodeAt((i += 3 / 4));
+
+  //       if (charCode > 0xff) {
+  //         throw new Error(
+  //           "'btoa' failed: The string to be encoded contains characters outside of the Latin1 range."
+  //         );
+  //       }
+
+  //       block = (block << 8) | charCode;
+  //     }
+
+  //     return output;
+  //   },
+  // };
   const params = React.useContext(NetworkContext);
   const { itemId, accessToken } = params;
   const [error, setError] = React.useState(null);
   const [itemState, setItemState] = React.useState(null);
+  // const [imageBuffer, setImageBuffer] = React.useState(null);
   const [itemFlavours, setItemFlavours] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
   const itemActivity = itemState && itemState.isEnabled ? "Active" : "Inactive";
@@ -26,6 +55,19 @@ function ItemDetailsScreen({ navigation }) {
       handleFetchItem();
     }
   }, []);
+
+  // React.useEffect(() => {
+  //   if (itemState) {
+  //     const buffer = itemState.fileBuffer.data;
+  //     let binary = "";
+  //     let bytes = new Uint8Array(buffer);
+  //     let len = bytes.byteLength;
+  //     for (let i = 0; i < len; i++) {
+  //       binary += String.fromCharCode(bytes[i]);
+  //     }
+  //     setImageBuffer(Base64.btoa(binary));
+  //   }
+  // }, [itemState]);
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
@@ -138,7 +180,6 @@ function ItemDetailsScreen({ navigation }) {
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
       />
-      {/* <Text style={styles.itemText}>Flavours: {map.}</Text> */}
     </View>
   );
   return (
@@ -148,6 +189,15 @@ function ItemDetailsScreen({ navigation }) {
           {itemState ? itemState.itemName : ""}
         </Text>
       </View>
+      {itemState ? (
+        <View style={styles.imageView}>
+          {/* <Image
+            style={styles.logo}
+            source={{ uri: `data:image/jpeg;base64,${imageBuffer}` }}
+          /> */}
+          <Image style={styles.image} source={{ uri: itemState.fileUri }} />
+        </View>
+      ) : null}
       {loading ? loadingIndicator : itemsRows}
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.editItem} onPress={handleEditItem}>
@@ -158,7 +208,7 @@ function ItemDetailsScreen({ navigation }) {
               fontWeight: "bold",
             }}
           >
-            Edit Item
+            Edit Items
           </Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.deleteItem} onPress={handleDeleteItem}>
@@ -183,8 +233,8 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   headerContainer: {
-    paddingTop: 50,
-    paddingBottom: 10,
+    // paddingTop: 50,
+    // paddingBottom: 30,
     paddingHorizontal: 30,
   },
   itemContainer: {
@@ -223,6 +273,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#b4151c",
     marginVertical: 5,
+    marginBottom: 50,
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 10,
@@ -231,6 +282,18 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     justifyContent: "center",
     alignItems: "center",
+  },
+  imageView: {
+    justifyContent: "flex-start",
+    alignItems: "flex-start",
+    marginHorizontal: 30,
+    marginVertical: 20,
+  },
+  image: {
+    width: 150,
+    height: 150,
+    borderRadius: 10,
+    resizeMode: "cover",
   },
 });
 

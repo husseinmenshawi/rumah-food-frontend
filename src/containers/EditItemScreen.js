@@ -9,8 +9,10 @@ import {
   Switch,
   ScrollView,
   Alert,
+  Image,
 } from "react-native";
 import { CheckBox } from "react-native-elements";
+import * as ImagePicker from "expo-image-picker";
 import { Formik } from "formik";
 import * as yup from "yup";
 import config from "../../config";
@@ -22,12 +24,21 @@ function EditItemScreen({ navigation }) {
   const { itemId, accessToken } = params;
 
   const [itemState, setItemState] = React.useState(null);
+  const [updatedImage, setUpdatedImage] = React.useState({});
 
   React.useEffect(() => {
     if (!itemState) {
       handleFetchItem();
     }
   }, []);
+
+  React.useEffect(() => {
+    if (itemState) {
+      setUpdatedImage({
+        uri: itemState.fileUri,
+      });
+    }
+  }, [itemState]);
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
@@ -59,7 +70,7 @@ function EditItemScreen({ navigation }) {
         setItemState(data);
       })
       .catch((e) => {
-        setError("Some server error!");
+        setEditItemError("Some server error!");
         throw new Error("Server Error", e);
       });
   };
@@ -69,6 +80,7 @@ function EditItemScreen({ navigation }) {
     itemPrice: "",
     itemDesc: "",
     isEnabled: "",
+    image: null,
     //TODO: find a better way to implement a checkbox in this form.
     flavours: [
       {
@@ -116,6 +128,7 @@ function EditItemScreen({ navigation }) {
       itemDesc: itemState.itemDesc,
       isEnabled: itemState.isEnabled,
       flavours: filtered,
+      image: { uri: itemState.fileUri },
     };
   }
 
@@ -126,12 +139,23 @@ function EditItemScreen({ navigation }) {
       .required("Item price is required"),
     itemDesc: yup.string().required("Item description is required"),
     isEnabled: yup.boolean().required("Item Activity is required"),
+    image: yup
+      .object()
+      .typeError("An image must be selected")
+      .required("An image must be selected"),
     flavours: yup.array().required("At least one flavour must be selected"),
   });
 
   const handleEditItem = (values) => {
-    const { itemName, itemPrice, itemDesc, isEnabled, flavours } = values;
-
+    const {
+      itemName,
+      itemPrice,
+      itemDesc,
+      isEnabled,
+      flavours,
+      image,
+    } = values;
+    console.log("IMAGE: ", image);
     const selectFlavours = flavours.filter((x) => {
       return x.checked == true;
     });
@@ -149,11 +173,16 @@ function EditItemScreen({ navigation }) {
         itemDesc,
         isEnabled,
         flavours: selectFlavourIds,
+        fileUri: image.uri,
+        fileMimeType: image.uri.split(".")[1],
       }),
     })
       .then((res) => {
         if (res.status === 204) {
           navigation.goBack();
+        }
+        if (res.status === 400) {
+          setEditItemError("Please fill up all fields");
         }
       })
       .catch((error) => {
@@ -209,6 +238,57 @@ function EditItemScreen({ navigation }) {
                   {formikProps.touched.itemPrice &&
                     formikProps.errors.itemPrice}
                 </Text>
+                <Text style={styles.text}>Item Image</Text>
+                {updatedImage && (
+                  <Image
+                    source={{ uri: updatedImage.uri }}
+                    style={{ width: 100, height: 100 }}
+                  />
+                )}
+                <TouchableOpacity
+                  style={styles.selectImage}
+                  onPress={async () => {
+                    if (Platform.OS !== "web") {
+                      const {
+                        status,
+                      } = await ImagePicker.requestCameraRollPermissionsAsync();
+                      if (status !== "granted") {
+                        alert(
+                          "Sorry, we need camera roll permissions to make this work!"
+                        );
+                      }
+                    }
+                    let result = await ImagePicker.launchImageLibraryAsync({
+                      mediaTypes: ImagePicker.MediaTypeOptions.All,
+                      allowsEditing: true,
+                      aspect: [4, 3],
+                      quality: 1,
+                      // base64: true,
+                    });
+
+                    if (!result.cancelled) {
+                      setUpdatedImage(result);
+                      formikProps.values.image = result;
+                      formikProps.setFieldValue(
+                        "image",
+                        formikProps.values.image
+                      );
+                    }
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontWeight: "bold",
+                      fontSize: 11,
+                      color: "white",
+                    }}
+                  >
+                    Change Image
+                  </Text>
+                </TouchableOpacity>
+                <Text style={styles.inputError}>
+                  {formikProps.touched.image && formikProps.errors.image}
+                </Text>
                 <Text style={styles.text}>Item Activity</Text>
                 <Switch
                   trackColor={{ false: "#767577", true: "#81b0ff" }}
@@ -245,6 +325,9 @@ function EditItemScreen({ navigation }) {
                       />
                     );
                   })}
+                <Text style={styles.inputError}>
+                  {formikProps.touched.flavours && formikProps.errors.flavours}
+                </Text>
                 <TouchableOpacity
                   style={styles.editButton}
                   onPress={formikProps.handleSubmit}
@@ -288,7 +371,7 @@ const styles = StyleSheet.create({
   editButton: {
     alignItems: "center",
     backgroundColor: "#00008B",
-    marginVertical: 20,
+    marginVertical: 50,
     paddingVertical: 10,
     borderRadius: 10,
   },
@@ -300,6 +383,15 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderColor: "white",
     paddingVertical: 1,
+  },
+  selectImage: {
+    color: "white",
+    alignItems: "center",
+    backgroundColor: "#00008B",
+    marginVertical: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    borderRadius: 10,
   },
 });
 

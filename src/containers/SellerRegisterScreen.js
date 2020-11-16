@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   TextInput,
   ActivityIndicator,
+  ScrollView,
   Alert,
 } from "react-native";
 
@@ -90,7 +91,7 @@ export default function SellerRegisterScreen({ navigation }) {
       { cancelable: false }
     );
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <View style={styles.titleContainer}>
         <Text style={styles.title}> Seller</Text>
       </View>
@@ -158,12 +159,12 @@ export default function SellerRegisterScreen({ navigation }) {
               </Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={navigateLandingScreen}>
-              <Text style={styles.loginText}>Not a Seller? Click here</Text>
+              <Text style={styles.loginText2}>Not a Seller? Click here</Text>
             </TouchableOpacity>
           </View>
         )}
       </Formik>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -171,7 +172,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
-    justifyContent: "center",
+    paddingTop: 20,
   },
   titleContainer: {
     flex: 0.1,
@@ -205,7 +206,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   loginText: {
-    marginBottom: 10,
+    marginBottom: 20,
+    alignSelf: "center",
+  },
+  loginText2: {
+    marginBottom: 50,
     alignSelf: "center",
   },
   inputError: {

@@ -129,6 +129,22 @@ function MyItemsScreen({ navigation }) {
     </View>
   );
 
+  const noItemsPlaceHolder = (
+    <View style={styles.noItemsPlaceHolder}>
+      <Text style={{ fontSize: 20 }}> No Items..</Text>
+      <Text
+        style={{
+          fontSize: 15,
+          paddingHorizontal: 30,
+          textAlign: "center",
+          paddingVertical: 5,
+        }}
+      >
+        To add an item, click on the plus icon on the top right..
+      </Text>
+    </View>
+  );
+
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
@@ -190,7 +206,11 @@ function MyItemsScreen({ navigation }) {
           </TouchableOpacity>
         </View>
       </View>
-      {loading ? loadingIndicator : itemsRows}
+      {loading
+        ? loadingIndicator
+        : items.length != 0
+        ? itemsRows
+        : noItemsPlaceHolder}
     </View>
   );
 }
@@ -258,6 +278,11 @@ const styles = StyleSheet.create({
   },
   loadingView: {
     paddingTop: 50,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  noItemsPlaceHolder: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },

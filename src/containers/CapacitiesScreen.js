@@ -209,6 +209,22 @@ function CapacitiesScreen({ navigation }) {
     </View>
   );
 
+  const noCapacitiesPlaceHolder = (
+    <View style={styles.noCapacitiesPlaceHolderView}>
+      <Text style={{ fontSize: 20 }}> No Capacities..</Text>
+      <Text
+        style={{
+          fontSize: 15,
+          paddingHorizontal: 30,
+          textAlign: "center",
+          paddingVertical: 5,
+        }}
+      >
+        To add a capacity, click on the plus icon on the top right..
+      </Text>
+    </View>
+  );
+
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
@@ -250,7 +266,7 @@ function CapacitiesScreen({ navigation }) {
         </View>
         <View
           style={{
-            flex: 0.6,
+            flex: 1,
             flexDirection: "row",
             justifyContent: "flex-end",
           }}
@@ -265,7 +281,11 @@ function CapacitiesScreen({ navigation }) {
           </TouchableOpacity>
         </View>
       </View>
-      {loading ? loadingIndicator : capacitiesRows}
+      {loading
+        ? loadingIndicator
+        : capacities.length != 0
+        ? capacitiesRows
+        : noCapacitiesPlaceHolder}
     </View>
   );
 }
@@ -343,6 +363,11 @@ const styles = StyleSheet.create({
   },
   loadingView: {
     paddingTop: 50,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  noCapacitiesPlaceHolderView: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
