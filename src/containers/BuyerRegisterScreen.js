@@ -7,6 +7,7 @@ import {
   TextInput,
   ActivityIndicator,
   Alert,
+  StatusBar,
 } from "react-native";
 
 import { Formik } from "formik";
@@ -90,6 +91,7 @@ export default function BuyerRegisterScreen({ navigation }) {
     );
   return (
     <View style={styles.container}>
+      <StatusBar barStyle={"dark-content"} />
       <View style={styles.titleContainer}>
         <Text style={styles.title}> Buyer</Text>
       </View>

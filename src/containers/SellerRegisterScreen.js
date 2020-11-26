@@ -7,6 +7,7 @@ import {
   TextInput,
   ActivityIndicator,
   ScrollView,
+  StatusBar,
   Alert,
 } from "react-native";
 
@@ -92,6 +93,7 @@ export default function SellerRegisterScreen({ navigation }) {
     );
   return (
     <ScrollView style={styles.container}>
+      <StatusBar barStyle={"dark-content"} />
       <View style={styles.titleContainer}>
         <Text style={styles.title}> Seller</Text>
       </View>
@@ -172,7 +174,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
-    paddingTop: 20,
+    paddingTop: 50,
   },
   titleContainer: {
     flex: 0.1,

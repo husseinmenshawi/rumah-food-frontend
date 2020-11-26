@@ -6,6 +6,7 @@ import HomeScreen from "../containers/HomeScreen";
 import MyItemsScreen from "../containers/MyItemsScreen";
 import ProfileScreen from "../containers/ProfileScreen";
 import CapacitiesScreen from "../containers/CapacitiesScreen";
+import OrdersScreen from "../containers/OrdersScreen";
 // import LoadingScreen from "../containers/LoadingScreen";
 
 import { NetworkContext } from "../../network-context";
@@ -30,6 +31,8 @@ export default function App({ route, navigation }) {
               iconName = "ios-person";
             } else if (route.name === "Capacities") {
               iconName = "md-calendar";
+            } else if (route.name === "Orders") {
+              iconName = "ios-paper";
             }
 
             return <Ionicons name={iconName} size={size} color={color} />;
@@ -47,6 +50,7 @@ export default function App({ route, navigation }) {
         {roleId === 2 && (
           <Tab.Screen name="My List" component={MyItemsScreen} />
         )}
+        {roleId === 2 && <Tab.Screen name="Orders" component={OrdersScreen} />}
         <Tab.Screen name="Profile" component={ProfileScreen} />
       </Tab.Navigator>
     </NetworkContext.Provider>

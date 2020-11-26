@@ -8,6 +8,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  StatusBar,
   ActivityIndicator,
 } from "react-native";
 
@@ -98,6 +99,7 @@ export default function BuyerLoginScreen({ navigation }) {
       behavior={Platform.OS == "ios" ? "padding" : "height"}
       style={styles.container}
     >
+      <StatusBar barStyle={"dark-content"} />
       {loading ? null : (
         <View style={styles.titleContainer}>
           <Text style={styles.title}> Buyer</Text>

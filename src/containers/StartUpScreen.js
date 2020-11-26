@@ -1,4 +1,3 @@
-import { StatusBar } from "expo-status-bar";
 import React from "react";
 import {
   StyleSheet,
@@ -6,6 +5,9 @@ import {
   View,
   TouchableOpacity,
   Platform,
+  StatusBar,
+  Image,
+  ImageBackground,
 } from "react-native";
 
 function StartUpScreen({ navigation }) {
@@ -15,31 +17,47 @@ function StartUpScreen({ navigation }) {
   const navigateBuyerScreen = () => {
     navigation.navigate("BuyerLogin");
   };
-  const MyStatusBar = ({ backgroundColor, ...props }) => (
-    <View style={[styles.statusBar, { backgroundColor }]}>
-      <StatusBar translucent backgroundColor={backgroundColor} {...props} />
-    </View>
-  );
 
   return (
     <View style={styles.container}>
-      <MyStatusBar backgroundColor="#5E8D48" barStyle="light-content" />
-      <TouchableOpacity
+      <StatusBar barStyle={"dark-content"} />
+      <View style={styles.topView}>
+        <Image style={styles.logo} source={require("../../assets/logo.png")} />
+      </View>
+      <View style={styles.middleView}>
+        <TouchableOpacity
+          style={styles.sellerView}
+          onPress={navigateSellerScreen}
+        >
+          <Text style={styles.text}>SELLER</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.buyerView}
+          onPress={navigateBuyerScreen}
+        >
+          <Text style={styles.text}>BUYER</Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.bottomView}>
+        <Text style={styles.bottomTextOne}> Developed By:</Text>
+        <Text style={styles.bottomTextTwo}> مكاش بلاصة</Text>
+      </View>
+      {/* <TouchableOpacity
         style={styles.sellerTouchable}
         onPress={navigateSellerScreen}
       >
         <View>
           <Text style={styles.text}>SELLER</Text>
         </View>
-      </TouchableOpacity>
-      <TouchableOpacity
+      </TouchableOpacity> */}
+      {/* <TouchableOpacity
         style={styles.buyerTouchable}
         onPress={navigateBuyerScreen}
       >
         <View>
           <Text style={styles.text}>BUYER</Text>
         </View>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 }
@@ -47,8 +65,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: "column",
   },
   sellerTouchable: {
     flex: 1,
@@ -69,8 +86,49 @@ const styles = StyleSheet.create({
     color: "black",
     fontWeight: "bold",
   },
-  statusBar: {
-    height: Platform.OS === "ios" ? 20 : StatusBar.currentHeight,
+  topView: {
+    flex: 0.4,
+    height: "100%",
+    width: "100%",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    backgroundColor: "#FBED19",
+  },
+  logo: {
+    height: 150,
+    width: 130,
+  },
+  middleView: {
+    flex: 0.3,
+    flexDirection: "row",
+  },
+  sellerView: {
+    flex: 1,
+    backgroundColor: "#FBED19",
+    paddingTop: 80,
+    alignItems: "center",
+  },
+  buyerView: {
+    flex: 1,
+    backgroundColor: "#FBED19",
+    paddingTop: 80,
+    alignItems: "center",
+  },
+  bottomView: {
+    flex: 0.3,
+    backgroundColor: "#FBED19",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  bottomTextOne: {
+    fontSize: 20,
+    color: "black",
+    // fontWeight: "bold",
+  },
+  bottomTextTwo: {
+    fontSize: 15,
+    color: "black",
+    // fontWeight: "bold",
   },
 });
 

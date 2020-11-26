@@ -19,9 +19,11 @@ function HomeScreen({ navigation }) {
   const [error, setError] = React.useState(null);
   const [items, setItems] = React.useState([]);
   const [rawCapacities, setRawCapacities] = React.useState([]);
+  const [orders, setOrders] = React.useState([]);
   const [capacities, setCapacities] = React.useState([]);
   const [loadingItems, setLoadingItems] = React.useState(false);
   const [loadingCapacities, setLoadingCapacities] = React.useState(false);
+  const [loadingOrders, setLoadingOrders] = React.useState(false);
 
   React.useEffect(() => {
     if (items.length === 0) {
@@ -29,6 +31,9 @@ function HomeScreen({ navigation }) {
     }
     if (rawCapacities.length === 0) {
       fetchCapacities();
+    }
+    if (orders.length === 0) {
+      fetchOrders();
     }
   }, []);
 
@@ -40,6 +45,7 @@ function HomeScreen({ navigation }) {
     const unsubscribe = navigation.addListener("focus", () => {
       fetchCapacities();
       fetchItems();
+      fetchOrders();
     });
 
     return unsubscribe;
@@ -106,6 +112,28 @@ function HomeScreen({ navigation }) {
       });
   };
 
+  const fetchOrders = () => {
+    setLoadingOrders(true);
+    fetch(`http://${config.ipAddress}:3000/api/v1.0/order/me`, {
+      method: "get",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        setLoadingOrders(false);
+        setOrders(data);
+      })
+      .catch((e) => {
+        setError("Some server error!");
+        throw new Error("Server Error", e);
+      });
+  };
+
   const handleRawCapacities = () => {
     const groupedCapacities = _.chain(rawCapacities)
       .groupBy(
@@ -164,7 +192,9 @@ function HomeScreen({ navigation }) {
       const item = items.find((x) => {
         return x.id == orders[i].kitchenItemId;
       });
-      totalSales = totalSales + item.itemPrice;
+      if (item) {
+        totalSales = totalSales + item.itemPrice;
+      }
     }
 
     return totalSales;
@@ -176,7 +206,9 @@ function HomeScreen({ navigation }) {
       const item = items.find((x) => {
         return x.id == rawCapacities[i].kitchenItemId;
       });
-      totalSales = totalSales + item.itemPrice;
+      if (item) {
+        totalSales = totalSales + item.itemPrice;
+      }
     }
 
     return totalSales;
@@ -208,7 +240,7 @@ function HomeScreen({ navigation }) {
       </View>
       <View style={styles.row}>
         <View style={styles.activeItemContainer}>
-          <Text style={styles.overviewNumber}>{getOrders()}</Text>
+          <Text style={styles.overviewNumber}>{orders.length}</Text>
           <Text>Order(s)</Text>
         </View>
         <View style={styles.RightActiveItemContainer}>
@@ -242,7 +274,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
   },
-  activeItemContainer : {
+  activeItemContainer: {
     flex: 1,
     flexDirection: "column",
     justifyContent: "center",

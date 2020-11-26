@@ -177,36 +177,16 @@ function AddItemScreen({ navigation }) {
         >
           {(formikProps) => (
             <View style={styles.addItemContainer}>
-              <Text style={styles.text}>Item Name</Text>
-              <TextInput
-                style={styles.textInput}
-                onChangeText={formikProps.handleChange("itemName")}
-              />
-              <Text style={styles.inputError}>
-                {formikProps.touched.itemName && formikProps.errors.itemName}
-              </Text>
-              <Text style={styles.text}>Item Description</Text>
-              <TextInput
-                style={styles.textInput}
-                onChangeText={formikProps.handleChange("itemDesc")}
-              />
-              <Text style={styles.inputError}>
-                {formikProps.touched.itemDesc && formikProps.errors.itemDesc}
-              </Text>
-              <Text style={styles.text}>Item Price</Text>
-              <TextInput
-                style={styles.textInput}
-                onChangeText={formikProps.handleChange("itemPrice")}
-              />
-              <Text style={styles.inputError}>
-                {formikProps.touched.itemPrice && formikProps.errors.itemPrice}
-              </Text>
               <Text style={styles.text}>Item Image</Text>
-              {image && (
+              {image ? (
                 <Image
                   source={{ uri: image.uri }}
                   style={{ width: 100, height: 100 }}
                 />
+              ) : (
+                <View style={styles.imagePlaceholder}>
+                  <Text style={{ fontSize: 12 }}>No Photo</Text>
+                </View>
               )}
               <TouchableOpacity
                 style={styles.selectImage}
@@ -222,7 +202,7 @@ function AddItemScreen({ navigation }) {
                     }
                   }
                   let result = await ImagePicker.launchImageLibraryAsync({
-                    mediaTypes: ImagePicker.MediaTypeOptions.All,
+                    mediaTypes: ImagePicker.MediaTypeOptions.Images,
                     allowsEditing: true,
                     aspect: [4, 3],
                     quality: 1,
@@ -251,6 +231,30 @@ function AddItemScreen({ navigation }) {
               </TouchableOpacity>
               <Text style={styles.inputError}>
                 {formikProps.touched.image && formikProps.errors.image}
+              </Text>
+              <Text style={styles.text}>Item Name</Text>
+              <TextInput
+                style={styles.textInput}
+                onChangeText={formikProps.handleChange("itemName")}
+              />
+              <Text style={styles.inputError}>
+                {formikProps.touched.itemName && formikProps.errors.itemName}
+              </Text>
+              <Text style={styles.text}>Item Description</Text>
+              <TextInput
+                style={styles.textInput}
+                onChangeText={formikProps.handleChange("itemDesc")}
+              />
+              <Text style={styles.inputError}>
+                {formikProps.touched.itemDesc && formikProps.errors.itemDesc}
+              </Text>
+              <Text style={styles.text}>Item Price</Text>
+              <TextInput
+                style={styles.textInput}
+                onChangeText={formikProps.handleChange("itemPrice")}
+              />
+              <Text style={styles.inputError}>
+                {formikProps.touched.itemPrice && formikProps.errors.itemPrice}
               </Text>
               <Text style={styles.text}>Flavours</Text>
               {dbFlavours.length != 0 &&
@@ -347,6 +351,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 10,
     borderRadius: 10,
+  },
+  imagePlaceholder: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    width: 100,
+    height: 100,
+    backgroundColor: "#adadad",
   },
 });
 

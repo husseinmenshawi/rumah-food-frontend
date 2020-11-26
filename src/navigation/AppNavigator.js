@@ -7,6 +7,7 @@ import ItemDetailsStack from "./ItemDetailsStack";
 import AddItemStack from "./AddItemStack";
 import EditProfileStack from "./EditProfileStack";
 import AddCapacityStack from "./AddCapacityStack";
+import OrderDetailsStack from "./OrderDetailsStack";
 // import Loading from '../containers/Loading';
 
 const Stack = createStackNavigator();
@@ -21,6 +22,7 @@ export const AppNavigator = (props) => (
       component={AppStack}
     />
     <Stack.Screen name="ItemDetails" component={ItemDetailsStack} />
+    <Stack.Screen name="OrderDetails" component={OrderDetailsStack} />
     <Stack.Screen name="AddItem" component={AddItemStack} />
     <Stack.Screen name="EditProfile" component={EditProfileStack} />
     <Stack.Screen name="AddCapacity" component={AddCapacityStack} />
