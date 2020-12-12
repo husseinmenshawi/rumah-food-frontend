@@ -63,6 +63,9 @@ export default function SellerLoginScreen({ route, navigation }) {
       .then((res) => {
         if (res.status === 401) {
           throw new Error("Login credentials invalid");
+        } else if (res.status === 404) {
+          console.log();
+          throw new Error("User not found");
         } else {
           return res.json();
         }

@@ -62,6 +62,8 @@ export default function BuyerLoginScreen({ navigation }) {
       .then((res) => {
         if (res.status === 401) {
           throw new Error("Login credentials invalid");
+        } else if (res.status === 404) {
+          throw new Error("User not found");
         } else {
           return res.json();
         }
@@ -71,6 +73,7 @@ export default function BuyerLoginScreen({ navigation }) {
         navigation.navigate("App", {
           accessToken: data.accessToken,
           roleId: 3,
+          userId: data.userId,
         });
       })
       .catch((error) => {

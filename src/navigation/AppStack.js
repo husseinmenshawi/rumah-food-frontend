@@ -2,11 +2,13 @@ import * as React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
-import HomeScreen from "../containers/HomeScreen";
+import SellerHomeScreen from "../containers/HomeScreen";
 import MyItemsScreen from "../containers/MyItemsScreen";
 import ProfileScreen from "../containers/ProfileScreen";
 import CapacitiesScreen from "../containers/CapacitiesScreen";
 import OrdersScreen from "../containers/OrdersScreen";
+import BuyerHomeScreen from "../containers/BuyerHomeScreen";
+import BuyerOrdersScreen from "../containers/BuyerOrdersScreen";
 // import LoadingScreen from "../containers/LoadingScreen";
 
 import { NetworkContext } from "../../network-context";
@@ -31,7 +33,7 @@ export default function App({ route, navigation }) {
               iconName = "ios-person";
             } else if (route.name === "Capacities") {
               iconName = "md-calendar";
-            } else if (route.name === "Orders") {
+            } else if (route.name === "Orders" || route.name === "My Orders") {
               iconName = "ios-paper";
             }
 
@@ -43,7 +45,10 @@ export default function App({ route, navigation }) {
           inactiveTintColor: "gray",
         }}
       >
-        <Tab.Screen name="Home" component={HomeScreen} />
+        {roleId === 2 && (
+          <Tab.Screen name="Home" component={SellerHomeScreen} />
+        )}
+
         {roleId === 2 && (
           <Tab.Screen name="Capacities" component={CapacitiesScreen} />
         )}
@@ -51,6 +56,10 @@ export default function App({ route, navigation }) {
           <Tab.Screen name="My List" component={MyItemsScreen} />
         )}
         {roleId === 2 && <Tab.Screen name="Orders" component={OrdersScreen} />}
+        {roleId === 3 && <Tab.Screen name="Home" component={BuyerHomeScreen} />}
+        {roleId === 3 && (
+          <Tab.Screen name="My Orders" component={BuyerOrdersScreen} />
+        )}
         <Tab.Screen name="Profile" component={ProfileScreen} />
       </Tab.Navigator>
     </NetworkContext.Provider>

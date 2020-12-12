@@ -114,32 +114,36 @@ function ProfileScreen({ navigation }) {
 
   const kitchenDetails = (
     <View style={styles.detailsContainer}>
-      <Text style={styles.detailsText}>
-        Kitchen Name: {user ? user.Kitchen.name : ""}
-      </Text>
-      <Text style={styles.detailsText}>
-        Email: {user ? user.Kitchen.email : ""}
-      </Text>
-      <Text style={styles.detailsText}>
-        Phone Number: {user ? user.Kitchen.phoneNumber : ""}
-      </Text>
-      <Text style={styles.detailsText}>
-        Address Line 1: {user ? user.Kitchen.addressLine1 : ""}
-      </Text>
-      <Text style={styles.detailsText}>
-        Address Line 2: {user ? user.Kitchen.addressLine2 : ""}
-      </Text>
-      <Text style={styles.detailsText}>
-        Address Line 3: {user ? user.Kitchen.addressLine3 : ""}
-      </Text>
-      <TouchableOpacity style={{ alignSelf: "flex-end" }}>
-        <Ionicons
-          style={{ color: "black" }}
-          name="md-create"
-          size={30}
-          color="black"
-        />
-      </TouchableOpacity>
+      {roleId == 2 ? (
+        <View>
+          <Text style={styles.detailsText}>
+            Kitchen Name: {user ? user.Kitchen.name : ""}
+          </Text>
+          <Text style={styles.detailsText}>
+            Email: {user ? user.Kitchen.email : ""}
+          </Text>
+          <Text style={styles.detailsText}>
+            Phone Number: {user ? user.Kitchen.phoneNumber : ""}
+          </Text>
+          <Text style={styles.detailsText}>
+            Address Line 1: {user ? user.Kitchen.addressLine1 : ""}
+          </Text>
+          <Text style={styles.detailsText}>
+            Address Line 2: {user ? user.Kitchen.addressLine2 : ""}
+          </Text>
+          <Text style={styles.detailsText}>
+            Address Line 3: {user ? user.Kitchen.addressLine3 : ""}
+          </Text>
+          <TouchableOpacity style={{ alignSelf: "flex-end" }}>
+            <Ionicons
+              style={{ color: "black" }}
+              name="md-create"
+              size={30}
+              color="black"
+            />
+          </TouchableOpacity>
+        </View>
+      ) : null}
     </View>
   );
 

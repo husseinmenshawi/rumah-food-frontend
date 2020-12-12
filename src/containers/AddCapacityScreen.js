@@ -25,50 +25,65 @@ function AddCapacityScreen({ navigation }) {
   const params = React.useContext(NetworkContext);
   const { accessToken, kitchenId } = params;
   const today = new Date();
-  const [startDate, setStartDate] = React.useState(today);
-  const [endDate, setEndDate] = React.useState(startDate);
+  const [date, setDate] = React.useState(today);
+  // const [startDate, setStartDate] = React.useState(today);
+  // const [endDate, setEndDate] = React.useState(startDate);
   const [selectedItem, setSelectedItem] = React.useState();
-  const [showStartDateCalendar, setShowStartDateCalendar] = React.useState(
+  const [showDateCalendar, setShowDateCalendar] = React.useState(
     false
   );
-  const [showEndDateCalendar, setShowEndDateCalendar] = React.useState(false);
+  // const [showStartDateCalendar, setShowStartDateCalendar] = React.useState(
+  //   false
+  // );
+  // const [showEndDateCalendar, setShowEndDateCalendar] = React.useState(false);
   const [showItemDropDown, setShowItemDropDown] = React.useState(false);
 
-  const calculateLengthOfAvailablity = () => {
-    const a = moment([
-      moment(startDate).year(),
-      moment(startDate).month(),
-      moment(startDate).date(),
-    ]);
-    const b = moment([
-      moment(endDate).year(),
-      moment(endDate).month(),
-      moment(endDate).date(),
-    ]);
-    return b.diff(a, "days") + 1;
-  };
+  // const calculateLengthOfAvailablity = () => {
+  //   const a = moment([
+  //     moment(startDate).year(),
+  //     moment(startDate).month(),
+  //     moment(startDate).date(),
+  //   ]);
+  //   const b = moment([
+  //     moment(endDate).year(),
+  //     moment(endDate).month(),
+  //     moment(endDate).date(),
+  //   ]);
+  //   return b.diff(a, "days") + 1;
+  // };
 
-  const onStartDateChange = (event, selectedDate, formikProps) => {
-    const currentDate = selectedDate || startDate;
-    setShowStartDateCalendar(Platform.OS === "ios");
-    setStartDate(currentDate);
+  const onDateChange = (event, selectedDate, formikProps) => {
+    const currentDate = selectedDate || date;
+    setShowDateCalendar(Platform.OS === "ios");
+    setDate(currentDate);
     //TODO: Check if this is best practice
-    setEndDate(currentDate);
     formikProps.setFieldValue(
-      "startDateTime",
+      "date",
       moment(currentDate).format("YYYY-MM-DD")
     );
   };
 
-  const onEndDateChange = (event, selectedDate, formikProps) => {
-    const currentDate = selectedDate || endDate;
-    setShowEndDateCalendar(Platform.OS === "ios");
-    setEndDate(currentDate);
-    formikProps.setFieldValue(
-      "endDateTime",
-      moment(currentDate).format("YYYY-MM-DD")
-    );
-  };
+  // const onStartDateChange = (event, selectedDate, formikProps) => {
+  //   const currentDate = selectedDate || startDate;
+  //   setShowStartDateCalendar(Platform.OS === "ios");
+  //   setStartDate(currentDate);
+  //   //TODO: Check if this is best practice
+  //   setEndDate(currentDate);
+  //   formikProps.setFieldValue(
+  //     "startDateTime",
+  //     moment(currentDate).format("YYYY-MM-DD")
+  //   );
+  // };
+
+  // const onEndDateChange = (event, selectedDate, formikProps) => {
+  //   const currentDate = selectedDate || endDate;
+  //   setShowEndDateCalendar(Platform.OS === "ios");
+  //   setEndDate(currentDate);
+  //   formikProps.setFieldValue(
+  //     "endDateTime",
+  //     moment(currentDate).format("YYYY-MM-DD")
+  //   );
+  // };
 
   React.useEffect(() => {
     if (dbKitchenItems.length === 0) {
@@ -84,24 +99,27 @@ function AddCapacityScreen({ navigation }) {
   }, [addCapacityError]);
 
   const initialValues = {
-    startDateTime: moment(startDate).format("YYYY-MM-DD"),
-    endDateTime: moment(endDate).format("YYYY-MM-DD"),
+    date: moment(date).format("YYYY-MM-DD"),
+    // startDateTime: moment(startDate).format("YYYY-MM-DD"),
+    // endDateTime: moment(endDate).format("YYYY-MM-DD"),
     kitchenId,
     kitchenItemId: selectedItem,
     amount: "1",
   };
 
   const validationSchema = yup.object().shape({
-    startDateTime: yup.date().required("Start date is required"),
-    endDateTime: yup.date().required("End date is required"),
+    date: yup.date().required("Start date is required"),
+    // startDateTime: yup.date().required("Start date is required"),
+    // endDateTime: yup.date().required("End date is required"),
     kitchenItemId: yup.string().required("Kitchen item is required"),
     amount: yup.number().required("Amount of capacities is required"),
   });
 
   const handleAddCapacity = (values, actions) => {
     const {
-      startDateTime,
-      endDateTime,
+      date,
+      // startDateTime,
+      // endDateTime,
       kitchenId,
       kitchenItemId,
       amount,
@@ -114,8 +132,9 @@ function AddCapacityScreen({ navigation }) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        startDateTime,
-        endDateTime,
+        date,
+        // startDateTime,
+        // endDateTime,
         kitchenId,
         kitchenItemId,
         amount,
@@ -195,11 +214,72 @@ function AddCapacityScreen({ navigation }) {
         >
           {(formikProps) => (
             <View style={styles.addItemContainer}>
-              <Text style={styles.text}>
-                {`Setting availability for : ${calculateLengthOfAvailablity()} Days `}
-              </Text>
+              {/* <Text style={styles.text}>
+                 {`Setting availability for : ${calculateLengthOfAvailablity()} Days `}
+              </Text> */}
               <View style={{ flex: 1, flexDirection: "row" }}>
+              <View
+                  style={{
+                    flex: 0.7,
+                    flexDirection: "row",
+                    justifyContent: "flex-start",
+                    alignItems: "center",
+                  }}
+                >
+                  <Text style={styles.text}>
+                    {`Date: ${moment(date).format("YYYY-MM-DD")}`}
+                  </Text>
+                </View>
                 <View
+                  style={{
+                    flex: 0.3,
+                    flexDirection: "row",
+                    justifyContent: "flex-end",
+                    alignItems: "center",
+                  }}
+                >
+                  <TouchableOpacity
+                    style={styles.selectDateButton}
+                    onPress={() => setShowDateCalendar(true)}
+                  >
+                    <Text
+                      style={{
+                        fontWeight: "bold",
+                        fontSize: 11,
+                        color: "white",
+                      }}
+                    >
+                      Select Date
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+              {showDateCalendar && (
+                <View>
+                  <DateTimePicker
+                    testID="dateTimePicker"
+                    value={date}
+                    mode={"date"}
+                    is24Hour={true}
+                    display="default"
+                    onChange={(event, selectedDate) =>
+                      onDateChange(event, selectedDate, formikProps)
+                    }
+                    minimumDate={
+                      new Date(
+                        moment(today).year(),
+                        moment(today).month(),
+                        moment(today).date()
+                      )
+                    }
+                  />
+                  <Button
+                    onPress={() => setShowDateCalendar(false)}
+                    title="Done"
+                  />
+                </View>
+              )}
+                {/* <View
                   style={{
                     flex: 0.7,
                     flexDirection: "row",
@@ -321,7 +401,7 @@ function AddCapacityScreen({ navigation }) {
                     title="Done"
                   />
                 </View>
-              )}
+              )} */}
               <View style={{ flex: 1, flexDirection: "row" }}>
                 <View
                   style={{

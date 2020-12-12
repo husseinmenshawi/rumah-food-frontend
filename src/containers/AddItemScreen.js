@@ -153,15 +153,20 @@ function AddItemScreen({ navigation }) {
       },
     })
       .then((res) => {
-        return res.json();
+        if (res.status === 403) {
+          navigation.goBack();
+          throw new Error("User not authorised, please contact IT Division");
+        } else {
+          return res.json();
+        }
       })
       .then((data) => {
         // setLoading(false);
+        console.log("IM HERE:", accessToken);
         setDbFlavours(data);
       })
       .catch((e) => {
-        setError("Some server error!");
-        throw new Error("Server Error", e);
+        setAddItemError(e);
       });
   };
 

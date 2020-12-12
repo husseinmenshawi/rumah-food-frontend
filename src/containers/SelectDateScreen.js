@@ -7,17 +7,20 @@ import {
   FlatList,
   Alert,
   ActivityIndicator,
+  ScrollView,
+  Image,
 } from "react-native";
+
 import { NetworkContext } from "../../network-context";
 import config from "../../config";
 
 import _ from "lodash";
 import moment from "moment";
-import Ionicons from "@expo/vector-icons/Ionicons";
 
-function CapacitiesScreen({ navigation }) {
+function SelectDateScreen({ navigation }) {
   const params = React.useContext(NetworkContext);
-  const { accessToken, kitchenId } = params;
+  const { item, accessToken, userId } = params;
+  const { kitchenId, id } = item;
   const [error, setError] = React.useState(null);
   const [rawCapacities, setRawCapacities] = React.useState([]);
   const [capacities, setCapacities] = React.useState([]);
@@ -25,7 +28,7 @@ function CapacitiesScreen({ navigation }) {
   const finalGroupedCapacities = [];
 
   React.useEffect(() => {
-    if (capacities.length === 0) {
+    if (rawCapacities.length == 0) {
       fetchCapacities();
     }
   }, []);
@@ -35,28 +38,16 @@ function CapacitiesScreen({ navigation }) {
   }, [rawCapacities]);
 
   React.useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", () => {
-      fetchCapacities();
-    });
-
-    return unsubscribe;
-  }, [navigation]);
-
-  React.useEffect(() => {
     if (error) {
-      Alert.alert(
-        "Error",
-        `${error}`,
-        [{ text: "OK", onPress: () => console.log("OK Pressed") }],
-        { cancelable: false }
-      );
+      errorAlert();
+      setError(null);
     }
   }, [error]);
 
   const fetchCapacities = () => {
     setLoading(true);
     fetch(
-      `http://${config.ipAddress}:3000/api/v1.0/kitchen/capacities/me?kitchenId=${kitchenId}`,
+      `http://${config.ipAddress}:3000/api/v1.0/kitchen/capacities/item/${id}`,
       {
         method: "get",
         headers: {
@@ -78,60 +69,49 @@ function CapacitiesScreen({ navigation }) {
       });
   };
 
-  const handleCapacityOnClick = (capacity) => {
-    // navigation.navigate("ItemDetails", {
-    //   capacityId: capacity.id,
-    //   accessToken,
-    // });
-  };
-
-  const handleAddCapacity = () => {
-    navigation.navigate("AddCapacity", {
-      kitchenId,
-      accessToken,
-    });
-  };
-
-  //TODO: Research more to check if this is the best practice
-  const handleFetchCapacities = () => {
-    fetchCapacities();
-  };
+  const errorAlert = () =>
+    Alert.alert(
+      "Error",
+      `${error}`,
+      [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+      { cancelable: true }
+    );
 
   const handleRawCapacities = () => {
     const groupedCapacities = _.chain(rawCapacities)
       .groupBy(
-        (x) => `${moment(x.date).format("YYYY-MM-DD")}_${x.KitchenItem.id}`
+        (x) => `${moment(x.date).format("YYYY-MM-DD")}_${x.kitchenItemId}`
       )
       .value();
 
     const capacityKeys = Object.keys(groupedCapacities);
     capacityKeys.forEach((key) => {
       const groupedCapacity = groupedCapacities[key];
-      const totalCapacity = groupedCapacity.length;
-      const availableCapacity = groupedCapacity.filter((x) => {
-        return !x.orderDateTime && !x.UserId;
-      });
+      const availableCapacity = groupedCapacity.length;
 
       const obj = {
         itemUniqueKey: `${moment(groupedCapacity[0].date).format(
           "YYYY-MM-DD"
-        )}_${groupedCapacity[0].KitchenItem.itemName}`,
-        itemName: groupedCapacity[0].KitchenItem.itemName,
-        itemId: groupedCapacity[0].KitchenItemId,
+        )}_${groupedCapacity[0].itemName}`,
+        itemName: groupedCapacity[0].itemName,
+        itemId: groupedCapacity[0].id,
         kitchenId: groupedCapacity[0].kitchenId,
         date: groupedCapacity[0].date,
-        // startDateTime: groupedCapacity[0].startDateTime,
-        // endDateTime: groupedCapacity[0].endDateTime,
-        // singleDateTime:
-        //   groupedCapacity[0].startDateTime == groupedCapacity[0].endDateTime
-        //     ? true
-        //     : false,
-        totalCapacity,
-        availableCapacity: availableCapacity.length,
+        day: moment(groupedCapacity[0].date).format("dddd"),
+        availableCapacity,
       };
       finalGroupedCapacities.push(obj);
     });
     setCapacities(finalGroupedCapacities);
+  };
+
+  const handleCapacityOnClick = (capacity) => {
+    navigation.navigate("AddOrder", {
+      item,
+      date: capacity.date,
+      userId,
+      accessToken
+    });
   };
 
   const Capacity = ({ item }) => (
@@ -148,7 +128,7 @@ function CapacitiesScreen({ navigation }) {
             alignItems: "center",
           }}
         >
-          <Text style={styles.primaryItemText}>{`${item.itemName}`}</Text>
+          <Text style={styles.primaryItemText}>{`${item.day}`}</Text>
         </View>
         <View
           style={{
@@ -160,8 +140,8 @@ function CapacitiesScreen({ navigation }) {
         >
           <Text
             style={styles.availableCount}
-          >{`${item.availableCapacity}`}</Text>
-          <Text>{`/${item.totalCapacity}`}</Text>
+          >{`${item.availableCapacity} `}</Text>
+          <Text style={{ marginTop: 5 }}>left</Text>
         </View>
       </View>
       <View style={{ flexDirection: "row" }}>
@@ -176,24 +156,13 @@ function CapacitiesScreen({ navigation }) {
           <Text style={styles.secondaryItemText}>{`Available on: ${moment(
             item.date
           ).format("YYYY-MM-DD")}`}</Text>
-          {/* {item.singleDateTime ? (
-            <Text style={styles.secondaryItemText}>{`Available on: ${moment(
-              item.startDateTime
-            ).format("YYYY-MM-DD")}`}</Text>
-          ) : (
-            <Text style={styles.secondaryItemText}>{`Available from: ${moment(
-              item.startDateTime
-            ).format("YYYY-MM-DD")} to: ${moment(item.endDateTime).format(
-              "YYYY-MM-DD"
-            )}`}</Text>
-          )} */}
         </View>
       </View>
     </TouchableOpacity>
   );
 
   const renderCapacity = ({ item }) => <Capacity item={item} />;
-  const capacitiesRows = (
+  const capacityRows = (
     <FlatList
       data={capacities}
       renderItem={renderCapacity}
@@ -204,13 +173,13 @@ function CapacitiesScreen({ navigation }) {
   const loadingIndicator = (
     <View style={styles.loadingView}>
       <ActivityIndicator size="large" />
-      <Text>Loading Capacities...</Text>
+      <Text>Loading...</Text>
     </View>
   );
 
   const noCapacitiesPlaceHolder = (
     <View style={styles.noCapacitiesPlaceHolderView}>
-      <Text style={{ fontSize: 20 }}> No Capacities..</Text>
+      <Text style={{ fontSize: 20 }}> Sold out..</Text>
       <Text
         style={{
           fontSize: 15,
@@ -219,72 +188,31 @@ function CapacitiesScreen({ navigation }) {
           paddingVertical: 5,
         }}
       >
-        To add a capacity, click on the plus icon on the top right..
+        It seems, like the item you are craving for is sold it!
       </Text>
     </View>
   );
-
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
         <View>
           <Text
             style={{
-              fontSize: 25,
+              fontSize: 20,
               fontWeight: "bold",
               alignSelf: "flex-start",
+              paddingBottom: 20,
             }}
           >
-            My Capacities
+            Availability for {item.itemName}
           </Text>
         </View>
-        <View
-          style={{
-            flex: 1,
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        ></View>
-        <View
-          style={{
-            flex: 1,
-            flexDirection: "row",
-            justifyContent: "flex-end",
-            alignItems: "center",
-          }}
-        >
-          <TouchableOpacity onPress={handleFetchCapacities}>
-            <Ionicons
-              style={{ color: "black" }}
-              name="ios-refresh"
-              size={30}
-              color="black"
-            />
-          </TouchableOpacity>
-        </View>
-        <View
-          style={{
-            flex: 1,
-            flexDirection: "row",
-            justifyContent: "flex-end",
-          }}
-        >
-          <TouchableOpacity onPress={handleAddCapacity}>
-            <Ionicons
-              style={{ color: "black" }}
-              name="ios-add-circle-outline"
-              size={30}
-              color="black"
-            />
-          </TouchableOpacity>
-        </View>
+        {loading
+          ? loadingIndicator
+          : capacities.length != 0
+          ? capacityRows
+          : noCapacitiesPlaceHolder}
       </View>
-      {loading
-        ? loadingIndicator
-        : capacities.length != 0
-        ? capacitiesRows
-        : noCapacitiesPlaceHolder}
     </View>
   );
 }
@@ -295,30 +223,13 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   headerContainer: {
-    flexDirection: "row",
-    paddingTop: 100,
-    paddingBottom: 10,
+    flex: 0.5,
     paddingHorizontal: 30,
   },
   activeItemContainer: {
     backgroundColor: "white",
     padding: 20,
-    marginHorizontal: 30,
-    marginVertical: 10,
-    borderRadius: 10,
-    shadowColor: "black",
-    shadowOpacity: 0.5,
-    shadowRadius: 2,
-    shadowOffset: {
-      height: 1,
-      width: 1,
-    },
-  },
-  inactiveItemContainer: {
-    backgroundColor: "white",
-    opacity: 0.3,
-    padding: 20,
-    marginHorizontal: 30,
+    marginHorizontal: 10,
     marginVertical: 10,
     borderRadius: 10,
     shadowColor: "black",
@@ -344,21 +255,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "black",
   },
-  buttonContainer: {
-    justifyContent: "flex-end",
-    paddingHorizontal: 30,
-    flex: 1,
-  },
-  addItem: {
+  loadingView: {
+    paddingTop: 50,
+    justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#006400",
-    marginVertical: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-  },
-  error: {
-    color: "red",
   },
   loadingView: {
     paddingTop: 50,
@@ -372,4 +272,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CapacitiesScreen;
+export default SelectDateScreen;

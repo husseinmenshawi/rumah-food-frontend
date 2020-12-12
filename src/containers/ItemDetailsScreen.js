@@ -175,11 +175,22 @@ function ItemDetailsScreen({ navigation }) {
         Item Description: {itemState ? itemState.itemDesc : ""}
       </Text>
       <Text style={styles.itemText}>Item Activity: {itemActivity}</Text>
-      <FlatList
+      <Text style={styles.itemText}>Flavours:</Text>
+      {itemState
+        ? itemState.Flavours.map((x) => {
+            return (
+              <Text
+                key={x.id}
+                style={styles.itemText}
+              >{`- ${x.flavourName}`}</Text>
+            );
+          })
+        : null}
+      {/* <FlatList
         data={itemFlavours}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
-      />
+      /> */}
     </View>
   );
   return (

@@ -5,7 +5,7 @@ import { NetworkContext } from "../../network-context";
 
 const Stack = createStackNavigator();
 
-export default function ItemStack({ route, navigation }) {
+export default function EditProfileStack({ route, navigation }) {
   const { params } = route;
   return (
     <NetworkContext.Provider value={params}>
