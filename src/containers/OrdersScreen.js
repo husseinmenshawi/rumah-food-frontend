@@ -19,6 +19,9 @@ function OrdersScreen({ navigation }) {
   const { accessToken, kitchenId } = params;
   const [error, setError] = React.useState(null);
   const [orders, setOrders] = React.useState([]);
+  const [bookedOrders, setBookedOrders] = React.useState(0);
+  const [confirmedOrders, setConfirmedOrders] = React.useState(0);
+  const [deliveredOrders, setDeliveredOrders] = React.useState(0);
   const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
@@ -26,6 +29,12 @@ function OrdersScreen({ navigation }) {
       fetchOrders();
     }
   }, []);
+
+  React.useEffect(() => {
+    if (orders.length !== 0) {
+      getEachOrderStatusLength();
+    }
+  }, [orders]);
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
@@ -154,6 +163,26 @@ function OrdersScreen({ navigation }) {
     </View>
   );
 
+  const getEachOrderStatusLength = () => {
+    const booked = orders.filter((x) => {
+      return x.orderStatusId == 1;
+    });
+
+    setBookedOrders(booked.length);
+
+    const confirmed = orders.filter((x) => {
+      return x.orderStatusId == 2;
+    });
+
+    setConfirmedOrders(confirmed.length);
+
+    const delivered = orders.filter((x) => {
+      return x.orderStatusId == 3;
+    });
+
+    setDeliveredOrders(delivered.length);
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
@@ -168,7 +197,7 @@ function OrdersScreen({ navigation }) {
             Orders
           </Text>
         </View>
-        <View
+        {/* <View
           style={{
             flex: 1,
             flexDirection: "row",
@@ -179,7 +208,6 @@ function OrdersScreen({ navigation }) {
           <Text style={{ fontSize: 25, fontWeight: "bold" }}>
             ({orders.length})
           </Text>
-          {/* <Text>/10</Text> */}
         </View>
         <View
           style={{
@@ -195,7 +223,36 @@ function OrdersScreen({ navigation }) {
             flexDirection: "row",
             justifyContent: "flex-end",
           }}
-        ></View>
+        ></View> */}
+      </View>
+      <View style={styles.subHeaderContainer}>
+        <View>
+          <Text
+            style={{
+              fontSize: 15,
+            }}
+          >
+            Booked : {bookedOrders}
+          </Text>
+        </View>
+        <View>
+          <Text
+            style={{
+              fontSize: 15,
+            }}
+          >
+            Confirmed : {confirmedOrders}
+          </Text>
+        </View>
+        <View>
+          <Text
+            style={{
+              fontSize: 15,
+            }}
+          >
+            Delivered : {deliveredOrders}
+          </Text>
+        </View>
       </View>
       {loading
         ? loadingIndicator
@@ -215,6 +272,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingTop: 100,
     paddingBottom: 10,
+    paddingHorizontal: 30,
+  },
+  subHeaderContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     paddingHorizontal: 30,
   },
   activeItemContainer: {

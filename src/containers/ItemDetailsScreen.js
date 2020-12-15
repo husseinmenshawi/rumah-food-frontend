@@ -97,6 +97,7 @@ function ItemDetailsScreen({ navigation }) {
         return res.json();
       })
       .then((data) => {
+        console.log("KITCHEN ITEM: ", data);
         setLoading(false);
         setItemState(data);
         setItemFlavours(data.Flavours);
@@ -137,11 +138,14 @@ function ItemDetailsScreen({ navigation }) {
       .then((res) => {
         if (res.status === 204) {
           navigation.goBack();
+        } else if (res.status === 400) {
+          throw new Error(
+            "Unable to delete item due to existing capacities tied to it"
+          );
         }
       })
       .catch((e) => {
-        setError("Some server error!");
-        throw new Error("Server Error", e);
+        setError(e.message);
       });
   };
 

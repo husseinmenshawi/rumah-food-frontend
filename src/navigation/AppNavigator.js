@@ -8,6 +8,7 @@ import AddItemStack from "./AddItemStack";
 import EditProfileStack from "./EditProfileStack";
 import AddCapacityStack from "./AddCapacityStack";
 import OrderDetailsStack from "./OrderDetailsStack";
+import BuyerOrderDetailsStack from "./BuyerOrderDetailsStack";
 import KitchenDetailsStack from "./KitchenDetailsStack";
 import SelectDateStack from "./SelectDateStack";
 import AddOrderStack from "./AddOrderStack";
@@ -29,6 +30,11 @@ export const AppNavigator = (props) => (
       options={{ title: "Back" }}
       name="OrderDetails"
       component={OrderDetailsStack}
+    />
+    <Stack.Screen
+      options={{ title: "Back" }}
+      name="BuyerOrderDetails"
+      component={BuyerOrderDetailsStack}
     />
     <Stack.Screen
       options={{ title: "Back" }}

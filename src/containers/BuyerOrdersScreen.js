@@ -71,7 +71,7 @@ function BuyerOrdersScreen({ navigation }) {
   };
 
   const handleOrderOnClick = (item) => {
-    navigation.navigate("OrderDetails", {
+    navigation.navigate("BuyerOrderDetails", {
       orderId: item.id,
       accessToken,
     });
@@ -80,7 +80,7 @@ function BuyerOrdersScreen({ navigation }) {
   const Item = ({ item }) => (
     <TouchableOpacity
       style={styles.activeItemContainer}
-      // onPress={() => handleOrderOnClick(item)}
+      onPress={() => handleOrderOnClick(item)}
     >
       <View style={{ flexDirection: "row" }}>
         <View

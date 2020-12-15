@@ -23,6 +23,7 @@ function CapacitiesScreen({ navigation }) {
   const [capacities, setCapacities] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
   const finalGroupedCapacities = [];
+  const today = moment().format("YYYY-MM-DD");
 
   React.useEffect(() => {
     if (capacities.length === 0) {
@@ -136,7 +137,11 @@ function CapacitiesScreen({ navigation }) {
 
   const Capacity = ({ item }) => (
     <TouchableOpacity
-      style={styles.activeItemContainer}
+      style={
+        item.date > today
+          ? styles.activeItemContainer
+          : styles.inactiveItemContainer
+      }
       onPress={() => handleCapacityOnClick(item)}
     >
       <View style={{ flexDirection: "row" }}>

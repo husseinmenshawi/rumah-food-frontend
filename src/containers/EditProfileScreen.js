@@ -10,6 +10,7 @@ import {
   Alert,
   ActivityIndicator,
   Dimensions,
+  KeyboardAvoidingView,
 } from "react-native";
 import { Formik } from "formik";
 import * as yup from "yup";
@@ -150,6 +151,7 @@ function EditProfileScreen({ navigation }) {
     </View>
   );
   return (
+    // <KeyboardAvoidingView style={styles.background}>
     <ScrollView style={styles.background}>
       <View style={styles.container}>
         {loading ? (
@@ -208,20 +210,22 @@ function EditProfileScreen({ navigation }) {
                   onChangeText={formikProps.handleChange("addressLine2")}
                   value={formikProps.values.addressLine2}
                 />
-                <Text style={styles.inputError}>
-                  {formikProps.touched.addressLine2 &&
-                    formikProps.errors.addressLine2}
-                </Text>
-                <Text style={styles.text}>Address Line 3</Text>
-                <TextInput
-                  style={styles.textInput}
-                  onChangeText={formikProps.handleChange("addressLine3")}
-                  value={formikProps.values.addressLine3}
-                />
-                <Text style={styles.inputError}>
-                  {formikProps.touched.addressLine3 &&
-                    formikProps.errors.addressLine3}
-                </Text>
+                <KeyboardAvoidingView behavior="height">
+                  <Text style={styles.inputError}>
+                    {formikProps.touched.addressLine2 &&
+                      formikProps.errors.addressLine2}
+                  </Text>
+                  <Text style={styles.text}>Address Line 3</Text>
+                  <TextInput
+                    style={styles.textInput}
+                    onChangeText={formikProps.handleChange("addressLine3")}
+                    value={formikProps.values.addressLine3}
+                  />
+                  <Text style={styles.inputError}>
+                    {formikProps.touched.addressLine3 &&
+                      formikProps.errors.addressLine3}
+                  </Text>
+                </KeyboardAvoidingView>
                 <TouchableOpacity
                   style={styles.editButton}
                   onPress={formikProps.handleSubmit}
