@@ -196,7 +196,11 @@ function BuyerOrderDetailsScreen({ navigation }) {
             justifyContent: "center",
           }}
         >
-          <Text style={{ fontSize: 20 }}>Let us know your feedback!</Text>
+          <Text style={{ fontSize: 20 }}>
+            {orderState && !orderState.reviewComment
+              ? `Let us know your feedback!`
+              : `Thanks for the feedback!`}
+          </Text>
         </View>
         <TouchableOpacity
           style={styles.reviewIcon}
@@ -289,7 +293,11 @@ function BuyerOrderDetailsScreen({ navigation }) {
         </Modal>
       </View>
       <View style={styles.reviewSubHeader}>
-        <Text>Give us a rating as soon as you received your order!</Text>
+        <Text>
+          {orderState && !orderState.reviewComment
+            ? `Give us a rating as soon as you received your order!`
+            : `We appreciate your feedback and we aim to provide the best service possible!`}
+        </Text>
       </View>
       {reviewState && reviewState.comment ? (
         <View

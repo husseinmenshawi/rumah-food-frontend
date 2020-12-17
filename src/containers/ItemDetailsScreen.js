@@ -11,6 +11,7 @@ import {
   Image,
 } from "react-native";
 
+import { Rating } from "react-native-elements";
 import { NetworkContext } from "../../network-context";
 import config from "../../config";
 
@@ -49,10 +50,14 @@ function ItemDetailsScreen({ navigation }) {
   const [itemFlavours, setItemFlavours] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
   const itemActivity = itemState && itemState.isEnabled ? "Active" : "Inactive";
+  const [reviewState, setReviewState] = React.useState(null);
 
   React.useEffect(() => {
     if (!itemState) {
       handleFetchItem();
+    }
+    if (!reviewState) {
+      handleFetchReview();
     }
   }, []);
 
@@ -97,10 +102,32 @@ function ItemDetailsScreen({ navigation }) {
         return res.json();
       })
       .then((data) => {
-        console.log("KITCHEN ITEM: ", data);
         setLoading(false);
         setItemState(data);
         setItemFlavours(data.Flavours);
+      })
+      .catch((e) => {
+        setError("Some server error!");
+        throw new Error("Server Error", e);
+      });
+  };
+
+  const handleFetchReview = () => {
+    fetch(
+      `http://${config.ipAddress}:3000/api/v1.0/review?kitchenItemId=${itemId}`,
+      {
+        method: "get",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+      }
+    )
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        setReviewState(data);
       })
       .catch((e) => {
         setError("Some server error!");
@@ -200,9 +227,23 @@ function ItemDetailsScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <Text style={{ fontSize: 25, fontWeight: "bold" }}>
-          {itemState ? itemState.itemName : ""}
-        </Text>
+        <View style={{ flex: 0.5 }}>
+          <Text style={{ fontSize: 20, fontWeight: "bold" }}>
+            {itemState ? itemState.itemName : ""}
+          </Text>
+        </View>
+        <View style={{ flex: 0.4, justifyContent: "center" }}>
+          <Rating
+            readonly
+            startingValue={reviewState ? reviewState.average : 0}
+            ratingCount={5}
+            imageSize={20}
+            fractions={1}
+          />
+        </View>
+        <View style={{ flex: 0.1, justifyContent: "center" }}>
+          <Text>{reviewState ? `(${reviewState.reviewsLength})` : "(0)"}</Text>
+        </View>
       </View>
       {itemState ? (
         <View style={styles.imageView}>
@@ -248,9 +289,8 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   headerContainer: {
-    // paddingTop: 50,
-    // paddingBottom: 30,
     paddingHorizontal: 30,
+    flexDirection: "row",
   },
   itemContainer: {
     padding: 10,

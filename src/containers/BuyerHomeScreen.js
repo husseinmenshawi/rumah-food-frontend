@@ -9,6 +9,8 @@ import {
   ActivityIndicator,
   StatusBar,
 } from "react-native";
+
+import { Rating } from "react-native-elements";
 import { NetworkContext } from "../../network-context";
 import config from "../../config";
 import _ from "lodash";
@@ -150,7 +152,7 @@ function BuyerHomeScreen({ navigation }) {
     navigation.navigate("KitchenDetails", {
       kitchenId: item.id,
       accessToken,
-      userId
+      userId,
     });
   };
 
@@ -171,6 +173,26 @@ function BuyerHomeScreen({ navigation }) {
           <Text style={styles.itemText}>{item.name}</Text>
         </View>
       </View>
+      <View style={{ flexDirection: "row" }}>
+        <View
+          style={{
+            flex: 1,
+            flexDirection: "row",
+            justifyContent: "flex-start",
+            alignItems: "center",
+          }}
+        >
+          <Rating
+            style={{ paddingBottom: 5 }}
+            readonly
+            startingValue={item ? item.reviewAverage : 0}
+            ratingCount={5}
+            imageSize={20}
+            fractions={1}
+          />
+        </View>
+      </View>
+
       <View style={{ flexDirection: "row" }}>
         <View
           style={{

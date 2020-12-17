@@ -194,6 +194,9 @@ function OrderDetailsScreen({ navigation }) {
         Remarks: {orderState ? orderState.comment : ""}
       </Text>
       <Text style={styles.itemText}>
+        Ordered Status: {orderState ? orderState.OrderStatus.status : ""}
+      </Text>
+      <Text style={styles.itemText}>
         Ordered Created:{" "}
         {orderState ? moment(orderState.createdAt).format("YYYY-MM-DD") : ""}
       </Text>

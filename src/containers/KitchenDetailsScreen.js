@@ -11,6 +11,7 @@ import {
   Image,
 } from "react-native";
 
+import { Rating } from "react-native-elements";
 import { NetworkContext } from "../../network-context";
 import config from "../../config";
 
@@ -117,13 +118,13 @@ function KitchenDetailsScreen({ navigation }) {
       { cancelable: true }
     );
 
-  const handleItemOnClick = (item) =>{
+  const handleItemOnClick = (item) => {
     navigation.navigate("SelectDate", {
       item,
       accessToken,
-      userId
+      userId,
     });
-  }
+  };
 
   const Item = ({ item }) => (
     <TouchableOpacity
@@ -135,12 +136,18 @@ function KitchenDetailsScreen({ navigation }) {
           style={{
             flex: 1,
             flexDirection: "column",
-            justifyContent: "flex-start",
+            justifyContent: "center",
             alignItems: "flex-start",
-            // backgroundColor: "red",
           }}
         >
           <Image style={styles.image} source={{ uri: item.fileUri }} />
+          <Rating
+            readonly
+            startingValue={item ? item.reviewAverage : 0}
+            ratingCount={5}
+            imageSize={20}
+            fractions={1}
+          />
         </View>
         <View
           style={{
@@ -148,7 +155,6 @@ function KitchenDetailsScreen({ navigation }) {
             flexDirection: "column",
             justifyContent: "flex-start",
             alignItems: "flex-start",
-            // backgroundColor: "blue",
           }}
         >
           <Text style={styles.priceText}>{`RM ${item.itemPrice}`}</Text>
@@ -283,6 +289,7 @@ const styles = StyleSheet.create({
     height: 110,
     borderRadius: 10,
     resizeMode: "cover",
+    marginBottom: 10,
   },
   noItemsPlaceHolder: {
     // flex: 1,

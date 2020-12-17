@@ -8,6 +8,8 @@ import {
   ActivityIndicator,
   ScrollView,
 } from "react-native";
+
+import { Rating } from "react-native-elements";
 import { NetworkContext } from "../../network-context";
 import config from "../../config";
 
@@ -15,14 +17,19 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 
 function ProfileScreen({ navigation }) {
   const params = React.useContext(NetworkContext);
-  const { accessToken, roleId } = params;
+  const { accessToken, roleId, kitchenId } = params;
   const roleName = roleId == 2 ? "Seller" : "Buyer";
   const [error, setError] = React.useState(null);
   const [user, setUser] = React.useState(null);
   const [loading, setLoading] = React.useState(false);
+  const [reviewState, setReviewState] = React.useState(null);
+
   React.useEffect(() => {
     if (!user) {
       fetchProfileDetails();
+    }
+    if (!reviewState) {
+      handleFetchReview();
     }
   }, []);
 
@@ -79,6 +86,29 @@ function ProfileScreen({ navigation }) {
     navigation.navigate("EditProfile", {
       accessToken,
     });
+  };
+
+  const handleFetchReview = () => {
+    fetch(
+      `http://${config.ipAddress}:3000/api/v1.0/review?kitchenId=${kitchenId}`,
+      {
+        method: "get",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+      }
+    )
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        setReviewState(data);
+      })
+      .catch((e) => {
+        setError("Some server error!");
+        throw new Error("Server Error", e);
+      });
   };
 
   const profileDetails = (
@@ -161,8 +191,34 @@ function ProfileScreen({ navigation }) {
         </View>
         {loading ? loadingIndicator : profileDetails}
         {roleId === 2 && (
-          <View style={styles.headerContainer}>
-            <Text style={{ fontSize: 25, fontWeight: "bold" }}>Kitchen</Text>
+          <View style={styles.headerKitchenContainer}>
+            <View style={{ flex: 0.5 }}>
+              <Text style={{ fontSize: 25, fontWeight: "bold" }}>Kitchen</Text>
+            </View>
+            <View
+              style={{
+                flex: 0.4,
+                justifyContent: "center",
+              }}
+            >
+              <Rating
+                readonly
+                startingValue={reviewState ? reviewState.average : 0}
+                ratingCount={5}
+                imageSize={20}
+                fractions={1}
+              />
+            </View>
+            <View
+              style={{
+                flex: 0.1,
+                justifyContent: "center",
+              }}
+            >
+              <Text>
+                {reviewState ? `(${reviewState.reviewsLength})` : "(0)"}
+              </Text>
+            </View>
           </View>
         )}
         {loading && roleId === 2
@@ -199,6 +255,11 @@ const styles = StyleSheet.create({
   headerContainer: {
     paddingTop: 50,
     paddingHorizontal: 30,
+  },
+  headerKitchenContainer: {
+    paddingTop: 50,
+    paddingHorizontal: 30,
+    flexDirection: "row",
   },
   detailsContainer: {
     backgroundColor: "white",
