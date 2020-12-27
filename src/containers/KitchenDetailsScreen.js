@@ -178,6 +178,7 @@ function KitchenDetailsScreen({ navigation }) {
 
   const itemsRows = (
     <FlatList
+      style={{ paddingBottom: 50 }}
       data={items}
       renderItem={renderItem}
       keyExtractor={(item) => item.id}
